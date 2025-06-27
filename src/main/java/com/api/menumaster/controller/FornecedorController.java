@@ -1,7 +1,7 @@
 package com.api.menumaster.controller;
 
-import com.api.menumaster.dtos.request.request.RequestFornecedorDto;
-import com.api.menumaster.dtos.request.request.RequestFornecedorUpdateDto;
+import com.api.menumaster.dtos.request.RequestFornecedorDto;
+import com.api.menumaster.dtos.request.RequestFornecedorUpdateDto;
 import com.api.menumaster.service.FornecedorService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Size;
