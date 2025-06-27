@@ -8,5 +8,6 @@ public record RequestFornecedorUpdateDto(@NotBlank String razaoSocial,
                                          @NotBlank @Size(min = 14, max = 14) String cnpj,
                                          @NotBlank @Size(min = 9, max = 9) String inscricaoEstadual,
                                          String endereco,
-                                         String contato) {
+                                         String contato,
+                                         boolean isAtivo) {
 }
