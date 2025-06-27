@@ -1,4 +1,4 @@
-package com.api.menumaster.dtos.request;
+package com.api.menumaster.dtos.request.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

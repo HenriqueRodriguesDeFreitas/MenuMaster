@@ -1,6 +1,6 @@
 package com.api.menumaster.service;
 
-import com.api.menumaster.dtos.request.RequestFornecedorDto;
+import com.api.menumaster.dtos.request.request.RequestFornecedorDto;
 import com.api.menumaster.dtos.request.request.RequestFornecedorUpdateDto;
 import com.api.menumaster.dtos.response.ResponseFornecedorDto;
 import com.api.menumaster.exception.custom.ConflictException;
