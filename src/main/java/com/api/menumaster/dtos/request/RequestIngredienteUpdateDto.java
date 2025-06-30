@@ -1,11 +1,11 @@
-package com.api.menumaster.dtos.response;
+package com.api.menumaster.dtos.request;
 
 import com.api.menumaster.model.enums.UnidadeMedida;
 
 import java.math.BigDecimal;
 import java.util.UUID;
 
-public record RequestIngredienteUpdateDto(UUID id,
+public record RequestIngredienteUpdateDto(
                                           Integer codigo,
                                           String nome,
                                           String descricao,
