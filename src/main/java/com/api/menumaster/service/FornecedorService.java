@@ -114,12 +114,12 @@ public class FornecedorService {
 
     private void verificarExistente(RequestFornecedorDto dto) {
         fornecedorRepository.findByCnpj(dto.cnpj())
-                .orElseThrow(() -> new ConflictException("cnpj já cadastrado"));
+                .ifPresent( s-> {throw new ConflictException("cnpj já cadastrado");});
         fornecedorRepository.findByInscricaoEstadual(dto.inscricaoEstadual())
-                .orElseThrow(() -> new ConflictException("IE já cadastrado"));
+                .ifPresent(s -> {throw new ConflictException("IE já cadastrado");});
         fornecedorRepository.findByRazaoSocialIgnoreCase(dto.razaoSocial())
-                .orElseThrow(() -> new ConflictException("razão social já cadastrado"));
+                .ifPresent(s -> {throw new ConflictException("razão social já cadastrado");});
         fornecedorRepository.findByNomeFantasiaIgnoreCase(dto.nomeFantasia())
-                .orElseThrow(() -> new ConflictException("nome fantasia já cadastrado"));
+                .ifPresent(s -> {throw new ConflictException("nome fantasia já cadastrado");});
     }
 }
