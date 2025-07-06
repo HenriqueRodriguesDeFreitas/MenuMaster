@@ -6,6 +6,8 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -47,6 +49,9 @@ public class Ingrediente {
 
     @Column(name = "controlar_estoque")
     private boolean controlarEstoque;
+
+    @OneToMany(mappedBy = "ingrediente")
+    private List<EntradaIngredienteItem> entradaItems = new ArrayList<>();
 
     public Ingrediente() {
     }
@@ -147,5 +152,13 @@ public class Ingrediente {
 
     public void setCodigo(Integer codigo) {
         this.codigo = codigo;
+    }
+
+    public List<EntradaIngredienteItem> getEntradaItems() {
+        return entradaItems;
+    }
+
+    public void setEntradaItems(List<EntradaIngredienteItem> entradaItems) {
+        this.entradaItems = entradaItems;
     }
 }
