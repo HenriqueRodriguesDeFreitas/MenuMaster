@@ -13,37 +13,34 @@ import com.api.menumaster.repository.EntradaIngredienteItemRepository;
 import com.api.menumaster.repository.EntradaIngredienteRepository;
 import com.api.menumaster.repository.FornecedorRepository;
 import com.api.menumaster.repository.IngredienteRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
-public class EntradaNotaIngredienteService {
+public class EntradaIngredienteService {
 
     private final FornecedorRepository fornecedorRepository;
     private final IngredienteRepository ingredienteRepository;
     private final EntradaIngredienteRepository entradaRepository;
-    private final EntradaIngredienteItemRepository itemEntradaRespository;
 
-    public EntradaNotaIngredienteService(FornecedorRepository fornecedorRepository,
-                                         IngredienteRepository ingredienteRepository,
-                                         EntradaIngredienteRepository entradaRepository,
-                                         EntradaIngredienteItemRepository itemEntradaRespository) {
+    public EntradaIngredienteService(FornecedorRepository fornecedorRepository,
+                                     IngredienteRepository ingredienteRepository,
+                                     EntradaIngredienteRepository entradaRepository) {
         this.fornecedorRepository = fornecedorRepository;
         this.ingredienteRepository = ingredienteRepository;
         this.entradaRepository = entradaRepository;
-        this.itemEntradaRespository = itemEntradaRespository;
     }
 
-    public ResponseEntradaNotaIngredienteDto entrada(RequestEntradaNotaIngredienteDto dto, UUID idFornecedor) {
-       if(dto.itens() == null){
-           throw new EntityNotFoundException("Entrada só possível com iten adicionados.");
-       }
+    @Transactional
+    public ResponseEntradaNotaIngredienteDto entrada(UUID idFornecedor, RequestEntradaNotaIngredienteDto dto) {
+        if (dto.itens() == null) {
+            throw new EntityNotFoundException("Entrada só possível com iten adicionados.");
+        }
 
         Fornecedor fornecedor = fornecedorRepository.findById(idFornecedor)
                 .orElseThrow(() -> new EntityNotFoundException("Nenhum forncedor com este id encontrado"));
@@ -51,19 +48,31 @@ public class EntradaNotaIngredienteService {
         EntradaIngrediente entrada = new EntradaIngrediente(dto.dataEntrada(), dto.numeroNota(),
                 dto.serieNota(), fornecedor, BigDecimal.ZERO, dto.observacao());
 
-        List<EntradaIngredienteItem> itens = new ArrayList<>();
 
-        if(entrada.verificarSeNotaPertenceAoFornecedor(entradaRepository)){
+        if (entrada.verificarSeNotaPertenceAoFornecedor(entradaRepository)) {
             throw new ConflictException("Já existe uma nota com este número para o fornecedor");
         }
 
         dto.itens().forEach(i -> {
             Ingrediente ingrediente = ingredienteRepository.findByCodigo(i.codigoIngrediente())
-                    .orElseThrow(()-> new EntityNotFoundException("Ingrediente não encontrado"));
+                    .orElseThrow(() -> new EntityNotFoundException("Ingrediente não encontrado"));
             entrada.addItemIngrediente(ingrediente, i.qtdEntrada(), i.valorCusto());
         });
 
         entrada.calcularTotalNota();
+         entrada.getItens().forEach(i ->{
+             Ingrediente ingrediente = ingredienteRepository.findByCodigo(i.getIngrediente().getCodigo())
+                     .orElseThrow(()-> new EntityNotFoundException("Erro em atualizar ingrediente: " +
+                             i.getIngrediente().getNome()));
+             ingrediente.setPrecoCusto(i.getCustoUnitario());
+             ingrediente.setPrecoVenda(ingrediente.getPrecoCusto().multiply(BigDecimal.valueOf(1.1)));
+
+             if(ingrediente.getEstoque() == null){
+                 ingrediente.setEstoque(BigDecimal.ZERO.add(i.getQuantidade()));
+             }else{
+                 ingrediente.setEstoque(ingrediente.getEstoque().add(i.getQuantidade()));
+             }
+         });
 
         EntradaIngrediente entradaSalva = entradaRepository.save(entrada);
         return converteObjetoParaDto(entradaSalva);
