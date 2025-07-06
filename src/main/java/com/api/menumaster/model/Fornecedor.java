@@ -2,6 +2,7 @@ package com.api.menumaster.model;
 
 import jakarta.persistence.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -32,6 +33,9 @@ public class Fornecedor {
 
     @Column(name = "is_ativo")
     private boolean isAtivo;
+
+    @OneToMany(mappedBy = "fornecedor")
+    private List<EntradaIngrediente> entradasIngredientes;
 
     public Fornecedor() {
     }
@@ -104,5 +108,13 @@ public class Fornecedor {
 
     public void setAtivo(boolean ativo) {
         isAtivo = ativo;
+    }
+
+    public List<EntradaIngrediente> getEntradasIngredientes() {
+        return entradasIngredientes;
+    }
+
+    public void setEntradasIngredientes(List<EntradaIngrediente> entradasIngredientes) {
+        this.entradasIngredientes = entradasIngredientes;
     }
 }
