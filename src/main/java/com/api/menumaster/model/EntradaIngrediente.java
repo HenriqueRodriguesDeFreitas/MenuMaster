@@ -35,7 +35,7 @@ public class EntradaIngrediente {
     @Column(length = 250)
     private String observacao;
 
-    @OneToMany(mappedBy = "entrada", cascade = CascadeType.PERSIST)
+    @OneToMany(mappedBy = "entrada", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<EntradaIngredienteItem> itens = new ArrayList<>();
 
 
