@@ -149,6 +149,66 @@ public class EntradaIngredienteService {
             }
             entrada.addItemIngrediente(ingrediente, i.qtdEntrada(), i.valorCusto());
         });
+    }
+
+    private void processarItensAdicionados(RequestUpdateItensEntradaIngredienteDto dto,
+                                           EntradaIngrediente entrada) {
+        dto.itens().forEach(i -> {
+            Ingrediente ingrediente = ingredienteRepository.findByCodigo(i.codigoIngrediente())
+                    .orElseThrow(() -> new EntityNotFoundException("Ingrediente não encontrado"));
+            if (!ingrediente.isAtivo()) {
+                throw new ConflictException("Ingrediente: " + ingrediente.getNome() + " inativo");
+            }
+            entrada.addItemIngrediente(ingrediente, i.qtdEntrada(), i.valorCusto());
+        });
+    }
+
+    private void atualizarPrecoEstoqueComDiferenca(EntradaIngrediente entrada,
+                                                   List<EntradaIngredienteItem> itensOriginais) {
+        // Agrupa itens originais por ingrediente (soma quantidades)
+        Map<Ingrediente, BigDecimal> totaisOriginais = itensOriginais.stream()
+                .collect(Collectors.groupingBy(
+                        EntradaIngredienteItem::getIngrediente,
+                        Collectors.reducing(
+                                BigDecimal.ZERO,
+                                EntradaIngredienteItem::getQuantidade,
+                                BigDecimal::add
+                        )
+                ));
+
+        // Agrupa novos itens por ingrediente (soma quantidades)
+        Map<Ingrediente, BigDecimal> totaisNovos = entrada.getItens().stream()
+                .collect(Collectors.groupingBy(
+                        EntradaIngredienteItem::getIngrediente,
+                        Collectors.reducing(
+                                BigDecimal.ZERO,
+                                EntradaIngredienteItem::getQuantidade,
+                                BigDecimal::add
+                        )
+                ));
+
+        // Processa todos os ingredientes envolvidos
+        Set<Ingrediente> todosIngredientes = new HashSet<>();
+        todosIngredientes.addAll(totaisOriginais.keySet());
+        todosIngredientes.addAll(totaisNovos.keySet());
+
+        for (Ingrediente ingrediente : todosIngredientes) {
+            BigDecimal totalOriginal = totaisOriginais.getOrDefault(ingrediente, BigDecimal.ZERO);
+            BigDecimal totalNovo = totaisNovos.getOrDefault(ingrediente, BigDecimal.ZERO);
+            BigDecimal diferenca = totalNovo.subtract(totalOriginal);
+
+            // Atualiza estoque
+            BigDecimal novoEstoque = ingrediente.getEstoque().add(diferenca);
+            if (novoEstoque.compareTo(BigDecimal.ZERO) < 0) {
+                throw new ConflictException("Estoque não pode ficar negativo para: " + ingrediente.getNome());
+            }
+            ingrediente.setEstoque(novoEstoque);
+
+            // Atualiza preço (pega o último custo unitário do ingrediente na lista)
+            if (totalNovo.compareTo(BigDecimal.ZERO) > 0) {
+                Optional<EntradaIngredienteItem> ultimoItem = entrada.getItens().stream()
+                        .filter(item -> item.getIngrediente().equals(ingrediente))
+                        .reduce((first, second) -> second);
 
         entrada.calcularTotalNota();
          entrada.getItens().forEach(i ->{
