@@ -235,15 +235,12 @@ public class EntradaIngredienteService {
             ingrediente.setPrecoCusto(i.getCustoUnitario());
             ingrediente.setPrecoVenda(ingrediente.getPrecoCusto().multiply(BigDecimal.valueOf(1.1)));
 
-             if(ingrediente.getEstoque() == null){
-                 ingrediente.setEstoque(BigDecimal.ZERO.add(i.getQuantidade()));
-             }else{
-                 ingrediente.setEstoque(ingrediente.getEstoque().add(i.getQuantidade()));
-             }
-         });
-
-        EntradaIngrediente entradaSalva = entradaRepository.save(entrada);
-        return converteObjetoParaDto(entradaSalva);
+            if (ingrediente.getEstoque() == null) {
+                ingrediente.setEstoque(BigDecimal.ZERO.add(i.getQuantidade()));
+            }else {
+                ingrediente.setEstoque(ingrediente.getEstoque().add(i.getQuantidade()));
+            }
+        });
     }
 
     private ResponseEntradaNotaIngredienteDto converteObjetoParaDto(EntradaIngrediente entrada) {
