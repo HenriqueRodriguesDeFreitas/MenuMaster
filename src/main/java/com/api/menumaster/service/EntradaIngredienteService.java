@@ -1,6 +1,7 @@
 package com.api.menumaster.service;
 
 import com.api.menumaster.dtos.request.RequestEntradaNotaIngredienteDto;
+import com.api.menumaster.dtos.request.RequestUpdateItensEntradaIngredienteDto;
 import com.api.menumaster.dtos.response.ResponseEntradaIngredienteItem;
 import com.api.menumaster.dtos.response.ResponseEntradaNotaIngredienteDto;
 import com.api.menumaster.exception.custom.ConflictException;
