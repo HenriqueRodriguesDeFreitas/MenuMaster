@@ -166,15 +166,7 @@ public class EntradaIngredienteService {
     private void atualizarPrecoEstoqueComDiferenca(EntradaIngrediente entrada,
                                                    List<EntradaIngredienteItem> itensOriginais) {
         // Agrupa itens originais por ingrediente (soma quantidades)
-        Map<Ingrediente, BigDecimal> totaisOriginais = itensOriginais.stream()
-                .collect(Collectors.groupingBy(
-                        EntradaIngredienteItem::getIngrediente,
-                        Collectors.reducing(
-                                BigDecimal.ZERO,
-                                EntradaIngredienteItem::getQuantidade,
-                                BigDecimal::add
-                        )
-                ));
+        Map<Ingrediente, BigDecimal> totaisOriginais = somarQuantidadePorIngredientes(itensOriginais);
 
         // Agrupa novos itens por ingrediente (soma quantidades)
         Map<Ingrediente, BigDecimal> totaisNovos = entrada.getItens().stream()
