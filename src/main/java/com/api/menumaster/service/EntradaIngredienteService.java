@@ -195,13 +195,45 @@ public class EntradaIngredienteService {
                         .filter(item -> item.getIngrediente().equals(ingrediente))
                         .reduce((first, second) -> second);
 
-        entrada.calcularTotalNota();
-         entrada.getItens().forEach(i ->{
-             Ingrediente ingrediente = ingredienteRepository.findByCodigo(i.getIngrediente().getCodigo())
-                     .orElseThrow(()-> new EntityNotFoundException("Erro em atualizar ingrediente: " +
-                             i.getIngrediente().getNome()));
-             ingrediente.setPrecoCusto(i.getCustoUnitario());
-             ingrediente.setPrecoVenda(ingrediente.getPrecoCusto().multiply(BigDecimal.valueOf(1.1)));
+                ultimoItem.ifPresent(item -> {
+                    ingrediente.setPrecoCusto(item.getCustoUnitario());
+                    ingrediente.setPrecoVenda(item.getCustoUnitario().multiply(BigDecimal.valueOf(1.1)));
+                });
+            }
+        }
+    }
+
+    private static Map<Ingrediente, BigDecimal> somarQuantidadePorIngredientes(List<EntradaIngredienteItem> itensOriginais) {
+        return itensOriginais.stream()
+                .collect(Collectors.groupingBy(
+                        EntradaIngredienteItem::getIngrediente,
+                        Collectors.reducing(
+                                BigDecimal.ZERO,
+                                EntradaIngredienteItem::getQuantidade,
+                                BigDecimal::add
+                        )
+                ));
+    }
+
+    private static Map<Ingrediente, BigDecimal> somarQuantidadePorIngrediente(EntradaIngrediente entrada) {
+        return entrada.getItens().stream()
+                .collect(Collectors.groupingBy(
+                        EntradaIngredienteItem::getIngrediente,
+                        Collectors.reducing(
+                                BigDecimal.ZERO,
+                                EntradaIngredienteItem::getQuantidade,
+                                BigDecimal::add
+                        )
+                ));
+    }
+
+    private void atualizarPrecoEstoqueIngrediente(EntradaIngrediente entrada) {
+        entrada.getItens().forEach(i -> {
+            Ingrediente ingrediente = ingredienteRepository.findByCodigo(i.getIngrediente().getCodigo())
+                    .orElseThrow(() -> new EntityNotFoundException("Erro em atualizar ingrediente: " +
+                            i.getIngrediente().getNome()));
+            ingrediente.setPrecoCusto(i.getCustoUnitario());
+            ingrediente.setPrecoVenda(ingrediente.getPrecoCusto().multiply(BigDecimal.valueOf(1.1)));
 
              if(ingrediente.getEstoque() == null){
                  ingrediente.setEstoque(BigDecimal.ZERO.add(i.getQuantidade()));
