@@ -9,7 +9,6 @@ import com.api.menumaster.model.EntradaIngrediente;
 import com.api.menumaster.model.EntradaIngredienteItem;
 import com.api.menumaster.model.Fornecedor;
 import com.api.menumaster.model.Ingrediente;
-import com.api.menumaster.repository.EntradaIngredienteItemRepository;
 import com.api.menumaster.repository.EntradaIngredienteRepository;
 import com.api.menumaster.repository.FornecedorRepository;
 import com.api.menumaster.repository.IngredienteRepository;
