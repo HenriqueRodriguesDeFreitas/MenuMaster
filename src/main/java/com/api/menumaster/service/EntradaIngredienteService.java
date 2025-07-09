@@ -169,15 +169,8 @@ public class EntradaIngredienteService {
         Map<Ingrediente, BigDecimal> totaisOriginais = somarQuantidadePorIngredientes(itensOriginais);
 
         // Agrupa novos itens por ingrediente (soma quantidades)
-        Map<Ingrediente, BigDecimal> totaisNovos = entrada.getItens().stream()
-                .collect(Collectors.groupingBy(
-                        EntradaIngredienteItem::getIngrediente,
-                        Collectors.reducing(
-                                BigDecimal.ZERO,
-                                EntradaIngredienteItem::getQuantidade,
-                                BigDecimal::add
-                        )
-                ));
+        Map<Ingrediente, BigDecimal> totaisNovos = somarQuantidadePorIngrediente(entrada);
+
 
         // Processa todos os ingredientes envolvidos
         Set<Ingrediente> todosIngredientes = new HashSet<>();
