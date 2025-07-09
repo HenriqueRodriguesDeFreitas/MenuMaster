@@ -245,8 +245,14 @@ public class EntradaIngredienteService {
 
     private ResponseEntradaNotaIngredienteDto converteObjetoParaDto(EntradaIngrediente entrada) {
         List<ResponseEntradaIngredienteItem> itens = entrada.getItens()
-                .stream().map(i -> new ResponseEntradaIngredienteItem(
-                        i.getIngrediente().getCodigo(), i.getQuantidade(), i.getCustoUnitario())).toList();
+                .stream().map(i -> {
+                    if (i.getIngrediente() == null) {
+                        throw new EntityNotFoundException("Ingrediente nulo em item da nota: " + entrada.getNumeroNota());
+                    }
+
+                    return new ResponseEntradaIngredienteItem(
+                            i.getIngrediente().getCodigo(), i.getQuantidade(), i.getCustoUnitario());
+                }).toList();
 
         return new ResponseEntradaNotaIngredienteDto(
                 entrada.getFornecedor().getRazaoSocial(), entrada.getDataEntrada(),
