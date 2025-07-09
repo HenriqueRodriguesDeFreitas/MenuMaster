@@ -260,4 +260,10 @@ public class EntradaIngredienteService {
                 entrada.getObservacao(), itens, entrada.getValorTotal()
         );
     }
+
+    private List<ResponseEntradaNotaIngredienteDto> converteObjetoParaDto(
+            List<EntradaIngrediente> entradas) {
+        return entradas.stream()
+                .map(this::converteObjetoParaDto).toList();
+    }
 }
