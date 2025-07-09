@@ -4,6 +4,8 @@ import com.api.menumaster.model.EntradaIngrediente;
 import com.api.menumaster.model.Fornecedor;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Optional;
