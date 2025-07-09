@@ -1,11 +1,16 @@
 package com.api.menumaster.controller;
 
 import com.api.menumaster.dtos.request.RequestEntradaNotaIngredienteDto;
+import com.api.menumaster.dtos.request.RequestUpdateItensEntradaIngredienteDto;
 import com.api.menumaster.service.EntradaIngredienteService;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
