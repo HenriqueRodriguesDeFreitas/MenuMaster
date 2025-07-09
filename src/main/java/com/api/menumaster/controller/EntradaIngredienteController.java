@@ -23,4 +23,51 @@ public class EntradaIngredienteController {
                                            @RequestBody @Valid RequestEntradaNotaIngredienteDto dto) {
         return ResponseEntity.ok(entradaService.entrada(idFornecedor, dto));
     }
+
+    @PutMapping("/{numeroNota}")
+    public ResponseEntity<?> atualizarEntrada(@PathVariable("numeroNota") String numeroNota,
+                                              @RequestBody RequestUpdateItensEntradaIngredienteDto dto) {
+        return ResponseEntity.ok(entradaService.atualizarItensDaNota(numeroNota, dto));
+    }
+
+    @GetMapping
+    public ResponseEntity<List<?>> findAll() {
+        return ResponseEntity.ok(entradaService.findAll());
+    }
+
+    @GetMapping("/byRazaoSocial/{razaoSocial}")
+    public ResponseEntity<List<?>> findByFornecedorRazaoSocial(@PathVariable("razaoSocial") String razaoSocial) {
+        return ResponseEntity.ok(entradaService.findByFornecedorRazaoSocial(razaoSocial));
+    }
+
+    @GetMapping("/byNomeFantasia/{nomeFantasia}")
+    public ResponseEntity<List<?>> findByFornecedorNomeFantasia(
+            @PathVariable("nomeFantasia") String nomeFantasia) {
+        return ResponseEntity.ok(entradaService.findByFornecedorNomeFantasia(nomeFantasia));
+    }
+
+    @GetMapping("/byDataEntrada/{dataEntrada}")
+    public ResponseEntity<List<?>> findByDataEntrada(
+            @PathVariable("dataEntrada") LocalDate dataEntrada) {
+        return ResponseEntity.ok(entradaService.findByDataEntrada(dataEntrada));
+    }
+
+    @GetMapping("/byNumeroNota/{numeroNota}")
+    public ResponseEntity<?> findByDataEntrada(
+            @PathVariable("numeroNota") String numeroNota) {
+        return ResponseEntity.ok(entradaService.findByNumeroNota(numeroNota));
+    }
+
+    @GetMapping("/byValorTotal/{valorTotal}")
+    public ResponseEntity<?> findByValorTotal(
+            @PathVariable("valorTotal") BigDecimal valorTotal) {
+        return ResponseEntity.ok(entradaService.findByValorTotalNota(valorTotal));
+    }
+
+    @DeleteMapping("/byNumeroNota/{numeroNota}")
+    public ResponseEntity<?> deleteByNumeroNota(@PathVariable("numeroNota") String numeroNota) {
+        entradaService.deleteByNumeroNota(numeroNota);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
 }
