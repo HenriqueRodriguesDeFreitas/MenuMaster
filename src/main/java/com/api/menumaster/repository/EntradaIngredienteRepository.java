@@ -13,7 +13,13 @@ public interface EntradaIngredienteRepository extends JpaRepository<EntradaIngre
 
     Optional<EntradaIngrediente> findByNumeroNota(String numeroNota);
 
-    List<EntradaIngrediente> findByFornecedor(Fornecedor fornecedor);
+    List<EntradaIngrediente> findByDataEntrada(LocalDate dataEntrada);
+
+    List<EntradaIngrediente> findByFornecedorRazaoSocial(String razaoSocial);
+
+    List<EntradaIngrediente> findByFornecedorNomeFantasia(String nomeFantasia);
+
+    List<EntradaIngrediente> findByValorTotal(BigDecimal valorTotal);
 
     boolean existsByFornecedorIdAndNumeroNota(UUID id, String numeroNota);
 }
