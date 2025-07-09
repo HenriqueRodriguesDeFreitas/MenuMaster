@@ -57,6 +57,90 @@ public class EntradaIngredienteService {
             throw new ConflictException("Já existe uma nota com este número para o fornecedor");
         }
 
+        processarItensAdicionados(dto, entrada);
+
+        entrada.calcularTotalNota();
+        atualizarPrecoEstoqueIngrediente(entrada);
+
+        EntradaIngrediente entradaSalva = entradaRepository.save(entrada);
+        return converteObjetoParaDto(entradaSalva);
+    }
+
+    @Transactional
+    public ResponseEntradaNotaIngredienteDto atualizarItensDaNota(
+            String numeroNota, RequestUpdateItensEntradaIngredienteDto dto) {
+
+        EntradaIngrediente entrada = entradaRepository.findByNumeroNota(numeroNota)
+                .orElseThrow(() -> new EntityNotFoundException("Nota não encontrada"));
+
+        if (!entrada.getFornecedor().isAtivo()) {
+            throw new ConflictException("Não é possivel modificar notas de fornecedor inativo.");
+        }
+
+        List<EntradaIngredienteItem> itensOriginais = new ArrayList<>(entrada.getItens());
+
+        entrada.getItens().clear();
+        processarItensAdicionados(dto, entrada);
+
+        entrada.calcularTotalNota();
+
+        atualizarPrecoEstoqueComDiferenca(entrada, itensOriginais);
+
+        return converteObjetoParaDto(entradaRepository.save(entrada));
+    }
+
+    public List<ResponseEntradaNotaIngredienteDto> findAll() {
+        List<EntradaIngrediente> entradas = entradaRepository.findAll();
+        return converteObjetoParaDto(entradas);
+    }
+
+    public List<ResponseEntradaNotaIngredienteDto> findByDataEntrada(LocalDate dataEntrada) {
+        List<EntradaIngrediente> entradas = entradaRepository.findByDataEntrada(dataEntrada);
+        return converteObjetoParaDto(entradas);
+    }
+
+    public List<ResponseEntradaNotaIngredienteDto> findByFornecedorRazaoSocial(String razaoSocial) {
+        List<EntradaIngrediente> entradas = entradaRepository.findByFornecedorRazaoSocial(razaoSocial);
+        return converteObjetoParaDto(entradas);
+    }
+
+    public List<ResponseEntradaNotaIngredienteDto> findByFornecedorNomeFantasia(String nomeFantasia) {
+        List<EntradaIngrediente> entradas = entradaRepository.findByFornecedorNomeFantasia(nomeFantasia);
+        return converteObjetoParaDto(entradas);
+    }
+
+    public ResponseEntradaNotaIngredienteDto findByNumeroNota(String numeroNota) {
+        EntradaIngrediente entrada = entradaRepository.findByNumeroNota(numeroNota)
+                .orElseThrow(() -> new EntityNotFoundException("Não existe nota com esta numeração"));
+        return converteObjetoParaDto(entrada);
+    }
+
+    public List<ResponseEntradaNotaIngredienteDto> findByValorTotalNota(BigDecimal valorTotal) {
+        List<EntradaIngrediente> entradas = entradaRepository.findByValorTotal(valorTotal);
+        return converteObjetoParaDto(entradas);
+    }
+
+    public void deleteByNumeroNota(String numeroNota) {
+        EntradaIngrediente entrada = entradaRepository.findByNumeroNota(numeroNota)
+                .orElseThrow(() -> new EntityNotFoundException("Não existem notas com este número"));
+
+        for (EntradaIngredienteItem i : entrada.getItens()) {
+            Ingrediente ingrediente = ingredienteRepository.findByCodigo(i.getIngrediente().getCodigo())
+                    .orElseThrow(() -> new EntityNotFoundException("Produto da entrada não encontrado em banco de dados: " + i.getIngrediente().getNome()));
+
+            BigDecimal qtdExtornado = ingrediente.getEstoque().subtract(i.getQuantidade());
+            if (qtdExtornado.compareTo(BigDecimal.ZERO) < 0) {
+                throw new ConflictException(
+                        String.format("Estoque do produto: %s insuficiente para estorno de nota.", ingrediente.getNome()));
+            }
+
+            ingrediente.setEstoque(qtdExtornado);
+            ingredienteRepository.save(ingrediente);
+        }
+        entradaRepository.delete(entrada);
+    }
+
+    private void processarItensAdicionados(RequestEntradaNotaIngredienteDto dto, EntradaIngrediente entrada) {
         dto.itens().forEach(i -> {
             Ingrediente ingrediente = ingredienteRepository.findByCodigo(i.codigoIngrediente())
                     .orElseThrow(() -> new EntityNotFoundException("Ingrediente não encontrado"));
