@@ -164,4 +164,12 @@ public class Ingrediente {
     public void setEntradaItems(List<EntradaIngredienteItem> entradaItems) {
         this.entradaItems = entradaItems;
     }
+
+    public List<IngredienteProduto> getProdutoAssociados() {
+        return produtoAssociados;
+    }
+
+    public void setProdutoAssociados(List<IngredienteProduto> produtoAssociados) {
+        this.produtoAssociados = produtoAssociados;
+    }
 }
