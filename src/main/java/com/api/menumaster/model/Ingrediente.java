@@ -53,6 +53,9 @@ public class Ingrediente {
     @OneToMany(mappedBy = "ingrediente")
     private List<EntradaIngredienteItem> entradaItems = new ArrayList<>();
 
+    @OneToMany(mappedBy = "ingrediente")
+    private List<IngredienteProduto> produtoAssociados = new ArrayList<>();
+
     public Ingrediente() {
     }
 
