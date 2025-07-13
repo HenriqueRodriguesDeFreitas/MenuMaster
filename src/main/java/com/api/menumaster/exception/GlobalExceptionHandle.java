@@ -31,4 +31,25 @@ public class GlobalExceptionHandle {
                 e.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
     }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ResponseErroDto> handleIllegalArgumentException(IllegalArgumentException e) {
+        ResponseErroDto response = new ResponseErroDto(LocalDateTime.now(),
+                HttpStatus.BAD_REQUEST.value(),
+                "Dados inválidos informados",
+                e.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    }
+
+    @ExceptionHandler(ProdutoVinculadoAPedidoException.class)
+    public ResponseEntity<ResponseErroDto> handleProdutoVinculadoAPedidoException(
+            ProdutoVinculadoAPedidoException e) {
+        ResponseErroDto response = new ResponseErroDto(
+                LocalDateTime.now(),
+                HttpStatus.CONFLICT.value(),
+                "Conflito: produto já vinculado a pedidos",
+                e.getMessage()
+        );
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+    }
 }
