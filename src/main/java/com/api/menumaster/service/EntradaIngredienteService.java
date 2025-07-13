@@ -185,7 +185,7 @@ public class EntradaIngredienteService {
             // Atualiza estoque
             BigDecimal novoEstoque = ingrediente.getEstoque().add(diferenca);
             if (novoEstoque.compareTo(BigDecimal.ZERO) < 0) {
-                throw new ConflictException("Estoque não pode ficar negativo para: " + ingrediente.getNome());
+                throw new ConflictEntityException("Estoque não pode ficar negativo para: " + ingrediente.getNome());
             }
             ingrediente.setEstoque(novoEstoque);
 
