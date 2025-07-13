@@ -127,6 +127,22 @@ public class Produto {
         isAtivo = ativo;
     }
 
+    public List<ItemProduto> getItensProduto() {
+        return itensProduto;
+    }
+
+    public UnidadeMedida getUnidadeMedida() {
+        return unidadeMedida;
+    }
+
+    public void setUnidadeMedida(UnidadeMedida unidadeMedida) {
+        this.unidadeMedida = unidadeMedida;
+    }
+
+    public void setItensProduto(List<ItemProduto> itensProduto) {
+        this.itensProduto = itensProduto;
+    }
+
     public List<IngredienteProduto> getIngredientesAssociados() {
         return ingredientesAssociados;
     }
