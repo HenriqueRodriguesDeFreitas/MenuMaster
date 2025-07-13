@@ -139,7 +139,7 @@ public class Produto {
         this.unidadeMedida = unidadeMedida;
     }
 
-    public void setItensProduto(List<ItemProduto> itensProduto) {
+    public void setItensProduto(List<ItemPedido> itensProduto) {
         this.itensProduto = itensProduto;
     }
 
