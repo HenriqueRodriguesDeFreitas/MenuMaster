@@ -49,7 +49,7 @@ public class Produto {
     private List<IngredienteProduto> ingredientesAssociados = new ArrayList<>();
 
     @OneToMany(mappedBy = "produto", cascade = {CascadeType.ALL, CascadeType.MERGE}, orphanRemoval = true)
-    private List<ItemProduto> itensProduto = new ArrayList<>();
+    private List<ItemPedido> itensProduto = new ArrayList<>();
 
 
     public Produto() {
