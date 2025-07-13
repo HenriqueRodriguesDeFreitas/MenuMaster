@@ -33,7 +33,7 @@ public class IngredienteService {
                 });
         ingredienteRepository.findByNomeIgnoreCase(dto.nome())
                 .ifPresent(i -> {
-                    throw new ConflictException("ingrediente já cadastrado");
+                    throw new ConflictEntityException("ingrediente já cadastrado");
                 });
 
         Ingrediente novoIngrediente = new Ingrediente();
