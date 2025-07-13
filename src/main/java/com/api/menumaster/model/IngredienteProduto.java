@@ -3,8 +3,6 @@ package com.api.menumaster.model;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -18,12 +16,6 @@ public class IngredienteProduto {
     @Column(precision = 10, scale = 3, nullable = false)
     private BigDecimal quantidade;
 
-    @Column(precision = 10, scale = 2, nullable = false)
-    private BigDecimal custo;
-
-    @Column(precision = 10, scale = 2)
-    private BigDecimal venda;
-
     @ManyToOne
     @JoinColumn(name = "ingrediente_id", nullable = false)
     private Ingrediente ingrediente;
@@ -35,10 +27,8 @@ public class IngredienteProduto {
     public IngredienteProduto() {
     }
 
-    public IngredienteProduto(BigDecimal quantidade, BigDecimal custo, BigDecimal venda, Ingrediente ingrediente, Produto produto) {
+    public IngredienteProduto(BigDecimal quantidade,Ingrediente ingrediente, Produto produto) {
         this.quantidade = quantidade;
-        this.custo = custo;
-        this.venda = venda;
         this.ingrediente = ingrediente;
         this.produto = produto;
     }
@@ -53,22 +43,6 @@ public class IngredienteProduto {
 
     public void setQuantidade(BigDecimal quantidade) {
         this.quantidade = quantidade;
-    }
-
-    public BigDecimal getCusto() {
-        return custo;
-    }
-
-    public void setCusto(BigDecimal custo) {
-        this.custo = custo;
-    }
-
-    public BigDecimal getVenda() {
-        return venda;
-    }
-
-    public void setVenda(BigDecimal venda) {
-        this.venda = venda;
     }
 
     public Ingrediente getIngrediente() {
@@ -86,4 +60,6 @@ public class IngredienteProduto {
     public void setProduto(Produto produto) {
         this.produto = produto;
     }
+
+    public void calcularCusto(){}
 }
