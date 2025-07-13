@@ -114,7 +114,7 @@ public class FornecedorService {
 
     private void verificarExistente(RequestFornecedorDto dto) {
         fornecedorRepository.findByCnpj(dto.cnpj())
-                .ifPresent( s-> {throw new ConflictException("cnpj já cadastrado");});
+                .ifPresent( s-> {throw new ConflictEntityException("cnpj já cadastrado");});
         fornecedorRepository.findByInscricaoEstadual(dto.inscricaoEstadual())
                 .ifPresent(s -> {throw new ConflictException("IE já cadastrado");});
         fornecedorRepository.findByRazaoSocialIgnoreCase(dto.razaoSocial())
