@@ -120,6 +120,6 @@ public class FornecedorService {
         fornecedorRepository.findByRazaoSocialIgnoreCase(dto.razaoSocial())
                 .ifPresent(s -> {throw new ConflictEntityException("razão social já cadastrado");});
         fornecedorRepository.findByNomeFantasiaIgnoreCase(dto.nomeFantasia())
-                .ifPresent(s -> {throw new ConflictException("nome fantasia já cadastrado");});
+                .ifPresent(s -> {throw new ConflictEntityException("nome fantasia já cadastrado");});
     }
 }
