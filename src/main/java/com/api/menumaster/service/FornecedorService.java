@@ -3,7 +3,7 @@ package com.api.menumaster.service;
 import com.api.menumaster.dtos.request.RequestFornecedorDto;
 import com.api.menumaster.dtos.request.RequestFornecedorUpdateDto;
 import com.api.menumaster.dtos.response.ResponseFornecedorDto;
-import com.api.menumaster.exception.custom.ConflictException;
+import com.api.menumaster.exception.custom.ConflictEntityException;
 import com.api.menumaster.exception.custom.EntityNotFoundException;
 import com.api.menumaster.model.Fornecedor;
 import com.api.menumaster.repository.FornecedorRepository;
