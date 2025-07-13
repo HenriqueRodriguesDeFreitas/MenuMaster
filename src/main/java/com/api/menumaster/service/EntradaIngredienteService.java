@@ -130,7 +130,7 @@ public class EntradaIngredienteService {
 
             BigDecimal qtdExtornado = ingrediente.getEstoque().subtract(i.getQuantidade());
             if (qtdExtornado.compareTo(BigDecimal.ZERO) < 0) {
-                throw new ConflictException(
+                throw new ConflictEntityException(
                         String.format("Estoque do produto: %s insuficiente para estorno de nota.", ingrediente.getNome()));
             }
 
