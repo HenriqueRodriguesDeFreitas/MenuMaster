@@ -6,8 +6,9 @@ import jakarta.validation.constraints.Size;
 
 import java.util.List;
 
-public record RequestAtualizarProdutoDto(@NotNull Long codigoProduto,
+public record RequestAtualizarProdutoDto(
                                          @NotBlank @Size(max = 50) String nome,
                                          @Size(max = 250) String descricao,
+                                         boolean isAtivo,
                                          @NotNull List<RequestIngredienteProdutoDto> ingredientes) {
 }
