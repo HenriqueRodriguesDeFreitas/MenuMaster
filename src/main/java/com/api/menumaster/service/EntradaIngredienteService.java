@@ -74,7 +74,7 @@ public class EntradaIngredienteService {
                 .orElseThrow(() -> new EntityNotFoundException("Nota não encontrada"));
 
         if (!entrada.getFornecedor().isAtivo()) {
-            throw new ConflictException("Não é possivel modificar notas de fornecedor inativo.");
+            throw new ConflictEntityException("Não é possivel modificar notas de fornecedor inativo.");
         }
 
         List<EntradaIngredienteItem> itensOriginais = new ArrayList<>(entrada.getItens());
