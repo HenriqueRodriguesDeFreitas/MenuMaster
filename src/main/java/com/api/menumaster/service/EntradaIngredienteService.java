@@ -46,7 +46,7 @@ public class EntradaIngredienteService {
                 .orElseThrow(() -> new EntityNotFoundException("Nenhum forncedor com este id encontrado"));
 
         if(!fornecedor.isAtivo()){
-            throw new ConflictException("Fornecedor inativo!");
+            throw new ConflictEntityException("Fornecedor inativo!");
         }
 
         EntradaIngrediente entrada = new EntradaIngrediente(dto.dataEntrada(), dto.numeroNota(),
