@@ -127,7 +127,7 @@ public class Produto {
         isAtivo = ativo;
     }
 
-    public List<ItemProduto> getItensProduto() {
+    public List<ItemPedido> getItensProduto() {
         return itensProduto;
     }
 
