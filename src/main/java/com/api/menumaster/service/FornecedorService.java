@@ -116,7 +116,7 @@ public class FornecedorService {
         fornecedorRepository.findByCnpj(dto.cnpj())
                 .ifPresent( s-> {throw new ConflictEntityException("cnpj já cadastrado");});
         fornecedorRepository.findByInscricaoEstadual(dto.inscricaoEstadual())
-                .ifPresent(s -> {throw new ConflictException("IE já cadastrado");});
+                .ifPresent(s -> {throw new ConflictEntityException("IE já cadastrado");});
         fornecedorRepository.findByRazaoSocialIgnoreCase(dto.razaoSocial())
                 .ifPresent(s -> {throw new ConflictException("razão social já cadastrado");});
         fornecedorRepository.findByNomeFantasiaIgnoreCase(dto.nomeFantasia())
