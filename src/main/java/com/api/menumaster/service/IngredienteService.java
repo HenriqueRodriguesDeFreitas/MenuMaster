@@ -29,7 +29,7 @@ public class IngredienteService {
     public ResponseIngredienteDto save(RequestIngredienteDto dto) {
         ingredienteRepository.findByCodigo(dto.codigo())
                 .ifPresent(i -> {
-                    throw new ConflictException(" Já ingrediente com o codigo: " + i.getCodigo());
+                    throw new ConflictEntityException(" Já ingrediente com o codigo: " + i.getCodigo());
                 });
         ingredienteRepository.findByNomeIgnoreCase(dto.nome())
                 .ifPresent(i -> {
