@@ -1,5 +1,6 @@
 package com.api.menumaster.model;
 
+import com.api.menumaster.model.enums.UnidadeMedida;
 import jakarta.persistence.*;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
