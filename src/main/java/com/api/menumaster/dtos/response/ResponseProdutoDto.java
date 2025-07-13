@@ -6,5 +6,8 @@ import java.util.List;
 public record ResponseProdutoDto(String nome,
                                  Long codigoProduto,
                                  String descricao,
-                                 @NotNull List<RequestIngredienteProdutoDto> ingredientes) {
+                                 BigDecimal precoCusto,
+                                 BigDecimal precoVenda,
+                                 boolean isAtivo,
+                                 List<ResponseIngredienteProdutoDto> ingredientes) {
 }
