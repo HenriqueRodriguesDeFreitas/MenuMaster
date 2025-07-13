@@ -1,7 +1,7 @@
 package com.api.menumaster.exception;
 
 import com.api.menumaster.dtos.response.ResponseErroDto;
-import com.api.menumaster.exception.custom.ConflictException;
+import com.api.menumaster.exception.custom.ConflictEntityException;
 import com.api.menumaster.exception.custom.EntityNotFoundException;
 import com.api.menumaster.exception.custom.ProdutoVinculadoAPedidoException;
 import org.springframework.http.HttpStatus;
