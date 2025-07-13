@@ -145,7 +145,7 @@ public class EntradaIngredienteService {
             Ingrediente ingrediente = ingredienteRepository.findByCodigo(i.codigoIngrediente())
                     .orElseThrow(() -> new EntityNotFoundException("Ingrediente não encontrado"));
             if (!ingrediente.isAtivo()) {
-                throw new ConflictException("Ingrediente: " + ingrediente.getNome() + " inativo");
+                throw new ConflictEntityException("Ingrediente: " + ingrediente.getNome() + " inativo");
             }
             entrada.addItemIngrediente(ingrediente, i.qtdEntrada(), i.valorCusto());
         });
