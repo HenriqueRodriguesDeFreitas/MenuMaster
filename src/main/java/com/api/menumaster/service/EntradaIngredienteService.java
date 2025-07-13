@@ -54,7 +54,7 @@ public class EntradaIngredienteService {
 
 
         if (entrada.verificarSeNotaPertenceAoFornecedor(entradaRepository)) {
-            throw new ConflictException("Já existe uma nota com este número para o fornecedor");
+            throw new ConflictEntityException("Já existe uma nota com este número para o fornecedor");
         }
 
         processarItensAdicionados(dto, entrada);
