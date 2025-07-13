@@ -39,6 +39,10 @@ public class Produto {
     @OneToMany(mappedBy = "produto", cascade = {CascadeType.ALL})
     private List<IngredienteProduto> ingredientesAssociados = new ArrayList<>();
 
+    @OneToMany(mappedBy = "produto", cascade = {CascadeType.ALL, CascadeType.MERGE}, orphanRemoval = true)
+    private List<ItemProduto> itensProduto = new ArrayList<>();
+
+
     public Produto() {
     }
 
