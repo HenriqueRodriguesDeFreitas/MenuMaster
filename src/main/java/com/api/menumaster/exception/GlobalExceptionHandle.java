@@ -14,8 +14,8 @@ import java.time.LocalDateTime;
 @RestControllerAdvice
 public class GlobalExceptionHandle {
 
-    @ExceptionHandler(ConflictException.class)
-    public ResponseEntity<ResponseErroDto> handleConflictException(ConflictException e) {
+    @ExceptionHandler(ConflictEntityException.class)
+    public ResponseEntity<ResponseErroDto> handleConflictException(ConflictEntityException e) {
         ResponseErroDto response = new ResponseErroDto(LocalDateTime.now(),
                 HttpStatus.CONFLICT.value(),
                 "Erro de conflito",
