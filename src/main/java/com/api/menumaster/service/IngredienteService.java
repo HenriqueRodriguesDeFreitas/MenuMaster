@@ -3,7 +3,7 @@ package com.api.menumaster.service;
 import com.api.menumaster.dtos.request.RequestIngredienteDto;
 import com.api.menumaster.dtos.request.RequestIngredienteUpdateDto;
 import com.api.menumaster.dtos.response.ResponseIngredienteDto;
-import com.api.menumaster.exception.custom.ConflictException;
+import com.api.menumaster.exception.custom.ConflictEntityException;
 import com.api.menumaster.exception.custom.EntityNotFoundException;
 import com.api.menumaster.model.Ingrediente;
 import com.api.menumaster.model.enums.UnidadeMedida;
