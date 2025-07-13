@@ -1,7 +1,7 @@
 package com.api.menumaster.exception.custom;
 
-public class ConflictException extends RuntimeException {
-    public ConflictException(String message) {
+public class ConflictEntityException extends RuntimeException {
+    public ConflictEntityException(String message) {
         super(message);
     }
 }
