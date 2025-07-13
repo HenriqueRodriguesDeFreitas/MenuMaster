@@ -150,4 +150,16 @@ public class Produto {
     public void setIngredientesAssociados(List<IngredienteProduto> ingredientesAssociados) {
         this.ingredientesAssociados = ingredientesAssociados;
     }
+
+    public void calcularPrecoCusto() {
+        this.precoCusto = ingredientesAssociados.stream()
+                .map(i -> i.getIngrediente().getPrecoCusto().multiply(i.getQuantidade()))
+                .reduce(BigDecimal.ZERO, BigDecimal::add)
+                .setScale(2, RoundingMode.HALF_UP);
+    }
+
+    public void calcularPrecoVenda() {
+        this.precoVenda = precoCusto.multiply(BigDecimal.valueOf(1.1))
+                .setScale(2, RoundingMode.HALF_UP);
+    }
 }
