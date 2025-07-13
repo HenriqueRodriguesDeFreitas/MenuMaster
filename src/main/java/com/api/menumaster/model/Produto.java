@@ -36,7 +36,12 @@ public class Produto {
     @Column(name = "is_ativo")
     private boolean isAtivo;
 
-    @OneToMany(mappedBy = "produto", cascade = {CascadeType.ALL})
+    @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
+    @Column(columnDefinition = "unidademedida", name = "unidade_medida")
+    private UnidadeMedida unidadeMedida;
+
+    @OneToMany(mappedBy = "produto", cascade = {CascadeType.ALL}, orphanRemoval = true)
     private List<IngredienteProduto> ingredientesAssociados = new ArrayList<>();
 
     @OneToMany(mappedBy = "produto", cascade = {CascadeType.ALL, CascadeType.MERGE}, orphanRemoval = true)
