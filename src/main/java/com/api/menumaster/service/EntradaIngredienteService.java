@@ -4,7 +4,7 @@ import com.api.menumaster.dtos.request.RequestEntradaNotaIngredienteDto;
 import com.api.menumaster.dtos.request.RequestUpdateItensEntradaIngredienteDto;
 import com.api.menumaster.dtos.response.ResponseEntradaIngredienteItem;
 import com.api.menumaster.dtos.response.ResponseEntradaNotaIngredienteDto;
-import com.api.menumaster.exception.custom.ConflictException;
+import com.api.menumaster.exception.custom.ConflictEntityException;
 import com.api.menumaster.exception.custom.EntityNotFoundException;
 import com.api.menumaster.model.EntradaIngrediente;
 import com.api.menumaster.model.EntradaIngredienteItem;
