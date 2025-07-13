@@ -4,6 +4,6 @@ import jakarta.validation.constraints.NotNull;
 
 import java.math.BigDecimal;
 
-public record ResponseIngredienteProdutoDto(@NotNull Integer codigoProduto,
-                                            @NotNull BigDecimal quantidade) {
+public record ResponseIngredienteProdutoDto(String nomeIngrediente,
+                                            BigDecimal quantidade) {
 }
