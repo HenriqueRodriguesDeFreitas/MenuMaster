@@ -79,7 +79,7 @@ public class IngredienteService {
     }
 
     public List<ResponseIngredienteDto> findByNome(String nome) {
-        List<Ingrediente> ingredientes = ingredienteRepository.findByNomeContainingIgnoreCase(nome);
+        List<Ingrediente> ingredientes = ingredienteRepository.findByNomeContainingIgnoreCaseOrderByNome(nome);
         return converteEntityToDto(ingredientes);
     }
 
