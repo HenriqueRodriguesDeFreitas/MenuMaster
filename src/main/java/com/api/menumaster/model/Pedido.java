@@ -1,5 +1,21 @@
 package com.api.menumaster.model;
 
+import com.api.menumaster.exception.custom.ConflictEntityException;
+import com.api.menumaster.model.enums.StatusPedido;
+import com.api.menumaster.model.enums.UnidadeMedida;
+import jakarta.persistence.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+@Entity
+@Table(name = "pedido")
 public class Pedido {
 
     @Id
