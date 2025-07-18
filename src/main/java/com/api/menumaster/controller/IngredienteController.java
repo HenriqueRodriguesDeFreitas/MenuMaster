@@ -29,7 +29,7 @@ public class IngredienteController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> update(@PathVariable("id")UUID id, @RequestBody RequestIngredienteUpdateDto dto){
+    public ResponseEntity<?> update(@PathVariable("id")UUID id, @RequestBody @Valid RequestIngredienteUpdateDto dto){
         return ResponseEntity.ok(ingredienteService.update(id, dto));
     }
 
