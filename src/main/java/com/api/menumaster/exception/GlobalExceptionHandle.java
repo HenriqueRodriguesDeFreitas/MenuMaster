@@ -52,4 +52,15 @@ public class GlobalExceptionHandle {
         );
         return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
     }
+
+    @ExceptionHandler(EstoqueInsuficienteException.class)
+    public ResponseEntity<ResponseErroDto> handleEstoqueInsuficienteException(EstoqueInsuficienteException e){
+        ResponseErroDto response = new ResponseErroDto(
+                LocalDateTime.now(),
+                HttpStatus.UNPROCESSABLE_ENTITY.value(),
+                "Entidade não processavel",
+                e.getMessage()
+        );
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(response);
+    }
 }
