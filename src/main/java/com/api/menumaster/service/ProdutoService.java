@@ -46,6 +46,7 @@ public class ProdutoService {
         produto.setDescricao(dto.descricao());
         produto.setAtivo(true);
         produto.setQuantidadeVendida(BigDecimal.ZERO);
+        produto.setUnidadeMedida(dto.unidadeMedida());
 
         List<IngredienteProduto> ingredienteProdutos = new ArrayList<>();
 
