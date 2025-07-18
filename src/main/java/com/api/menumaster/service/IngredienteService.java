@@ -56,6 +56,13 @@ public class IngredienteService {
         var ingredienteUpdate = ingredienteRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Ingrediente não cadastrado"));
 
+        // Validação do código - só conflita se for diferente do código atual
+        ingredienteRepository.findByCodigo(dto.codigo())
+                .ifPresent(ingredienteExistente -> {
+                    if (!ingredienteExistente.getId().equals(ingredienteUpdate.getId())) {
+                        throw new ConflictEntityException("Já existe ingrediente com o código: " + dto.codigo());
+                    }
+                });
         ingredienteUpdate.setNome(dto.nome());
         ingredienteUpdate.setDescricao(dto.descricao());
         ingredienteUpdate.setPrecoCusto(dto.precoCusto());
