@@ -65,7 +65,9 @@ public class ProdutoService {
                 .orElseThrow(() -> new EntityNotFoundException("Produto não encontrado"));
 
         produtoRepository.findByNomeIgnoreCase(dto.nome()).ifPresent(p -> {
-            throw new ConflictEntityException("Já existe um produto com este nome");
+            if(!p.getNome().equals(produto.getNome())){
+                throw new ConflictEntityException("Já existe um produto com este nome");
+            }
         });
 
         produto.setNome(dto.nome());
