@@ -53,10 +53,6 @@ public class IngredienteService {
 
     @Transactional
     public ResponseIngredienteDto update(UUID id, RequestIngredienteUpdateDto dto) {
-        ingredienteRepository.findByCodigo(dto.codigo())
-                .ifPresent(i -> {
-                    throw new ConflictEntityException(" Já ingrediente com o codigo: " + i.getCodigo());
-                });
         var ingredienteUpdate = ingredienteRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Ingrediente não cadastrado"));
 
