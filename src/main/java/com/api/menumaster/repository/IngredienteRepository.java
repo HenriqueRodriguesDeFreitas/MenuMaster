@@ -14,7 +14,7 @@ public interface IngredienteRepository extends JpaRepository<Ingrediente, UUID> 
     Optional<Ingrediente> findByCodigo(Integer codigo);
 
     Optional<Ingrediente> findByNomeIgnoreCase(String nome);
-    List<Ingrediente> findByNomeContainingIgnoreCase(String nome);
+    List<Ingrediente> findByNomeContainingIgnoreCaseOrderByNome(String nome);
 
     List<Ingrediente> findByDescricaoContainingIgnoreCase(String descricao);
 
