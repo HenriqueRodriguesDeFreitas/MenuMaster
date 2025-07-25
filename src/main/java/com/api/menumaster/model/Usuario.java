@@ -12,8 +12,7 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "usuario")
-public class Usuario {
-
+public class Usuario implements CredentialsContainer {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
