@@ -23,11 +23,12 @@ public class Usuario implements CredentialsContainer {
     @Column(nullable = false)
     private String senha;
 
-    @ManyToOne
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "role_id")
     private Role role;
 
-    public Usuario(){}
+    public Usuario() {
+    }
 
     public Usuario(String nome, String senha, Role role) {
         this.nome = nome;
@@ -65,5 +66,11 @@ public class Usuario implements CredentialsContainer {
 
     public void setRole(Role role) {
         this.role = role;
+    }
+
+
+    @Override
+    public void eraseCredentials() {
+        this.senha = null;
     }
 }
