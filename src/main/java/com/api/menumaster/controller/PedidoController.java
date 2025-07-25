@@ -6,6 +6,7 @@ import com.api.menumaster.model.enums.StatusPedido;
 import com.api.menumaster.service.PedidoService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -24,28 +25,33 @@ public class PedidoController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'GERENTE', 'LIDER', 'OPERADOR')")
     public ResponseEntity<?> criarPedido(@RequestBody @Valid RequestCriarPedidoDto dto) {
         return ResponseEntity.ok(pedidoService.criarPedido(dto));
     }
 
     @PutMapping("/{idPedido}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'GERENTE', 'LIDER')")
     public ResponseEntity<?> atualizarPedido(@PathVariable("idPedido") UUID idPedido,
                                              @RequestBody @Valid RequestAtualizarPedidoDto dto) {
         return ResponseEntity.ok(pedidoService.atualizarPedido(idPedido, dto));
     }
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'GERENTE', 'LIDER')")
     public ResponseEntity<List<?>> buscarTodosPedidos() {
         return ResponseEntity.ok(pedidoService.buscarTodosPedidos());
     }
 
     @GetMapping("/byDataEmissao")
+    @PreAuthorize("hasAnyRole('ADMIN', 'GERENTE', 'LIDER')")
     public ResponseEntity<List<?>> buscarPedidosPorData(@RequestParam(value = "dataInicial", required = true) LocalDate inicio,
                                                         @RequestParam(value = "dataFim", required = false) LocalDate fim) {
         return ResponseEntity.ok(pedidoService.buscarPedidosPorDataEmissao(inicio, fim));
     }
 
     @GetMapping("/byTotalPedido")
+    @PreAuthorize("hasAnyRole('ADMIN', 'GERENTE', 'LIDER')")
     public ResponseEntity<List<?>> buscarPedidosPorTotal(
             @RequestParam(value = "valorInicio", required = true) BigDecimal inicio,
             @RequestParam(value = "valorFim", required = false) BigDecimal fim) {
@@ -53,11 +59,13 @@ public class PedidoController {
     }
 
     @GetMapping("/byNumeroMesa/{numero}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'GERENTE', 'LIDER', 'OPERADOR')")
     public ResponseEntity<List<?>> buscarPedidosPorMesa(@PathVariable("numero") Integer numero) {
         return ResponseEntity.ok(pedidoService.buscarPorMesa(numero));
     }
 
     @GetMapping("/byStatusPedido/{status}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'GERENTE', 'LIDER', 'OPERADOR')")
     public ResponseEntity<List<?>> buscarPedidoPorStatus(@PathVariable("status") StatusPedido status) {
         return ResponseEntity.ok(pedidoService.buscarPedidoPorStatus(status));
     }
