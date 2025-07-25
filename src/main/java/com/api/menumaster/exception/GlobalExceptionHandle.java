@@ -51,6 +51,18 @@ public class GlobalExceptionHandle {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
     }
 
+    @ExceptionHandler(ConflictTesourariaException.class)
+    public ResponseEntity<ResponseErroDto> handleConflitoTesourariaJáAbertaException(
+            ConflictTesourariaException e) {
+        ResponseErroDto response = new ResponseErroDto(
+                LocalDateTime.now(),
+                HttpStatus.CONFLICT.value(),
+                "Conflito: Já existe uma tesouraria aberta",
+                e.getMessage()
+        );
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+    }
+
     @ExceptionHandler(EstoqueInsuficienteException.class)
     public ResponseEntity<ResponseErroDto> handleEstoqueInsuficienteException(EstoqueInsuficienteException e){
         ResponseErroDto response = new ResponseErroDto(
