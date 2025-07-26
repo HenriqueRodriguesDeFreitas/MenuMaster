@@ -1,6 +1,6 @@
 package com.api.menumaster.service;
 
-import com.api.menumaster.dtos.response.ResponseTesouraria;
+import com.api.menumaster.dtos.response.ResponseTesourariaDto;
 import com.api.menumaster.exception.custom.ConflictTesourariaException;
 import com.api.menumaster.model.Tesouraria;
 import com.api.menumaster.repository.TesourariaRepository;
@@ -8,7 +8,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.Optional;
+import java.time.LocalDateTime;
 
 @Service
 public class TesourariaService {
@@ -19,28 +19,40 @@ public class TesourariaService {
         this.tesourariaRepository = tesourariaRepository;
     }
 
-    public ResponseTesouraria abrirTesouraria(boolean abrir, Authentication authentication) {
+    public ResponseTesourariaDto abrirTesouraria(Authentication authentication) {
+        validarTesourariaAberta();
+        validarTesourariaFechadaParaReabrir();
 
-        if (abrir) {
-            if (tesourariaRepository.existsByDataFechamentoIsNull()) {
-                throw new ConflictTesourariaException("Feche a tesouraria anterior.");
-            }
+        BigDecimal saldoInicial = calcularSaldoInicial();
+        Tesouraria tesouraria = new Tesouraria(saldoInicial, authentication.getName());
+        return toResponseDto(tesourariaRepository.save(tesouraria));
+    }
 
-            BigDecimal saldoInicial = BigDecimal.ZERO;
-            Optional<Tesouraria> ultimaTesourariaOpt = tesourariaRepository
-                    .findFirstByDataFechamentoIsNotNullOrderByDataFechamentoDesc();
+    public ResponseTesourariaDto fecharTesouraria(Authentication authentication) {
+        Tesouraria tesourariaAberta = tesourariaRepository.findByDataFechamentoIsNull()
+                .orElseThrow(() -> new ConflictTesourariaException("Não existe tesouraria aberta para fechar"));
 
-            if (ultimaTesourariaOpt.isPresent()) {
-                Tesouraria ultimaTesouraria = ultimaTesourariaOpt.get();
-                if (ultimaTesouraria.getSaldoFinal() != null
-                        && ultimaTesouraria.getSaldoFinal().compareTo(BigDecimal.ZERO) >= 0) {
-                    saldoInicial = ultimaTesouraria.getSaldoFinal();
-                }
-            }
-            Tesouraria tesouraria = new Tesouraria(saldoInicial, authentication.getName());
-            return converterObjetoParaDto(tesourariaRepository.save(tesouraria));
-        } else {
-            return null;
+        tesourariaAberta.setDataFechamento(LocalDateTime.now());
+        tesourariaAberta.setUsuarioFechamento(authentication.getName());
+        tesourariaAberta.calcularSaldoFinal();
+
+        return toResponseDto(tesourariaRepository.save(tesourariaAberta));
+    }
+
+    public ResponseTesourariaDto reabrirTesouraria(Authentication authentication) {
+        Tesouraria tesouraria = tesourariaRepository.findFirstByDataFechamentoIsNotNullOrderByDataFechamentoDesc()
+                .orElseThrow(() -> new ConflictTesourariaException("Não existe tesouraria para reabrir"));
+
+        tesouraria.setDataFechamento(null);
+        tesouraria.setUsuarioReabertura(authentication.getName());
+        tesouraria.setDataAbertura(tesouraria.getDataAbertura());
+        tesouraria.setDataReabertura(LocalDateTime.now());
+        return toResponseDto(tesourariaRepository.save(tesouraria));
+    }
+
+    private void validarTesourariaAberta() {
+        if (tesourariaRepository.existsByDataFechamentoIsNull()) {
+            throw new ConflictTesourariaException("Existe tesouraria aberta");
         }
     }
 
