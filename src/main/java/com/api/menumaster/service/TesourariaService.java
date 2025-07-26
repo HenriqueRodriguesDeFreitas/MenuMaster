@@ -4,11 +4,16 @@ import com.api.menumaster.dtos.response.ResponseTesourariaDto;
 import com.api.menumaster.exception.custom.ConflictTesourariaException;
 import com.api.menumaster.model.Tesouraria;
 import com.api.menumaster.repository.TesourariaRepository;
+import org.apache.coyote.Response;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class TesourariaService {
@@ -50,6 +55,33 @@ public class TesourariaService {
         return toResponseDto(tesourariaRepository.save(tesouraria));
     }
 
+    public List<ResponseTesourariaDto> buscarTodasTesourarias() {
+        List<Tesouraria> tesourarias = tesourariaRepository.findAll();
+        return toResponseDto(tesourarias);
+    }
+
+    public List<ResponseTesourariaDto> buscarTesourariasPorDataAbertura(
+            LocalDate dataInicial, LocalDate dataFinal) {
+        List<Tesouraria> tesourarias;
+
+        LocalTime tempoPadrao = LocalTime.of(0, 0, 0);
+
+        LocalDateTime dataHoraTesourariaInicio = LocalDateTime.of(dataInicial.getYear(), dataInicial.getMonth(),
+                dataInicial.getDayOfMonth(), tempoPadrao.getHour(), tempoPadrao.getMinute(), tempoPadrao.getSecond());
+
+        LocalDateTime dataHoraTesourariaFim;
+        if (dataFinal != null) {
+            dataHoraTesourariaFim = LocalDateTime.of(dataFinal.getYear(), dataFinal.getMonth(), dataFinal.getDayOfMonth(),
+                    23, 59, 59);
+            tesourarias = tesourariaRepository.findByDataAberturaBetweenOrderByDataAbertura(dataHoraTesourariaInicio, dataHoraTesourariaFim);
+        } else {
+            dataHoraTesourariaFim = LocalDateTime.of(dataInicial.getYear(), dataInicial.getMonth(), dataInicial.getDayOfMonth(),
+                    23, 59, 59);
+            tesourarias = tesourariaRepository.findByDataAberturaBetweenOrderByDataAbertura(dataHoraTesourariaFim, dataHoraTesourariaFim);
+        }
+        return toResponseDto(tesourarias);
+    }
+
     private void validarTesourariaAberta() {
         if (tesourariaRepository.existsByDataFechamentoIsNull()) {
             throw new ConflictTesourariaException("Existe tesouraria aberta");
@@ -59,13 +91,15 @@ public class TesourariaService {
     private void validarTesourariaFechadaParaReabrir() {
         LocalDateTime hoje = LocalDateTime.now();
 
-               tesourariaRepository.findByDataFechamentoBetween(hoje.toLocalDate().atStartOfDay(),
-                               hoje.toLocalDate().atTime(23,59,59))
+        tesourariaRepository.findByDataFechamentoBetween(hoje.toLocalDate().atStartOfDay(),
+                        hoje.toLocalDate().atTime(23, 59, 59))
                 .stream()
-                .filter( tesouraria
+                .filter(tesouraria
                         -> tesouraria.getDataAbertura().toLocalDate().equals(hoje.toLocalDate()))
-                .findFirst().ifPresent(t -> { throw new ConflictTesourariaException(
-                        "Existe caixa aberto e fechado hoje. Utilize o endpoint para reabertura");});
+                .findFirst().ifPresent(t -> {
+                    throw new ConflictTesourariaException(
+                            "Existe caixa aberto e fechado hoje. Utilize o endpoint para reabertura");
+                });
 
 
         // Busca específica por caixas fechados HOJE
@@ -96,5 +130,10 @@ public class TesourariaService {
                 tesouraria.getDataFechamento(), tesouraria.getDataReabertura(),
                 tesouraria.getSaldoInicial(), tesouraria.getSaldoFinal(), tesouraria.getUsuarioAbertura(),
                 tesouraria.getUsuarioFechamento(), tesouraria.getUsuarioReabertura());
+    }
+
+    private List<ResponseTesourariaDto> toResponseDto(List<Tesouraria> tesourarias) {
+        return tesourarias.stream()
+                .map(this::toResponseDto).toList();
     }
 }
