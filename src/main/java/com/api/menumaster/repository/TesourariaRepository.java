@@ -20,4 +20,6 @@ public interface TesourariaRepository extends JpaRepository<Tesouraria, UUID> {
     Optional<Tesouraria> findByDataFechamento(LocalDateTime hoje);
 
     List<Tesouraria> findByDataFechamentoBetween(LocalDateTime inicio, LocalDateTime fim);
+
+    List<Tesouraria> findByDataAberturaBetweenOrderByDataAbertura(LocalDateTime dataInicio, LocalDateTime dataFim);
 }
