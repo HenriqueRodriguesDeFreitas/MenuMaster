@@ -56,10 +56,45 @@ public class TesourariaService {
         }
     }
 
-    private ResponseTesouraria converterObjetoParaDto(Tesouraria tesouraria) {
-        return new ResponseTesouraria(tesouraria.getId(), tesouraria.getDataAbertura(),
-                tesouraria.getSaldoInicial(), tesouraria.getSaldoFinal(),
-                tesouraria.getDataFechamento(), tesouraria.getUsuarioAbertura(),
-                tesouraria.getUsuarioFechamento());
+    private void validarTesourariaFechadaParaReabrir() {
+        LocalDateTime hoje = LocalDateTime.now();
+
+               tesourariaRepository.findByDataFechamentoBetween(hoje.toLocalDate().atStartOfDay(),
+                               hoje.toLocalDate().atTime(23,59,59))
+                .stream()
+                .filter( tesouraria
+                        -> tesouraria.getDataAbertura().toLocalDate().equals(hoje.toLocalDate()))
+                .findFirst().ifPresent(t -> { throw new ConflictTesourariaException(
+                        "Existe caixa aberto e fechado hoje. Utilize o endpoint para reabertura");});
+
+
+        // Busca específica por caixas fechados HOJE
+        tesourariaRepository.findByDataFechamento(hoje)
+                .stream()
+                .filter(caixa -> caixa.getDataAbertura().equals(hoje)) // Filtra os que foram abertos hoje
+                .findFirst()
+                .ifPresent(caixa -> {
+                    throw new ConflictTesourariaException(
+                            "Existe caixa aberto e fechado hoje. Utilize o endpoint de reabertura");
+                });
+    }
+
+    private BigDecimal calcularSaldoInicial() {
+        return tesourariaRepository
+                .findFirstByDataFechamentoIsNotNullOrderByDataFechamentoDesc()
+                .filter(this::temSaldoPositivo)
+                .map(Tesouraria::getSaldoFinal)
+                .orElse(BigDecimal.ZERO);
+    }
+
+    private boolean temSaldoPositivo(Tesouraria t) {
+        return t.getSaldoFinal() != null && t.getSaldoFinal().compareTo(BigDecimal.ZERO) >= 0;
+    }
+
+    private ResponseTesourariaDto toResponseDto(Tesouraria tesouraria) {
+        return new ResponseTesourariaDto(tesouraria.getId(), tesouraria.getDataAbertura(),
+                tesouraria.getDataFechamento(), tesouraria.getDataReabertura(),
+                tesouraria.getSaldoInicial(), tesouraria.getSaldoFinal(), tesouraria.getUsuarioAbertura(),
+                tesouraria.getUsuarioFechamento(), tesouraria.getUsuarioReabertura());
     }
 }
