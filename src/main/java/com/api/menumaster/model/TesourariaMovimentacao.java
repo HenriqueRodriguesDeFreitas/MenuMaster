@@ -18,7 +18,7 @@ public class TesourariaMovimentacao {
     @JoinColumn(name = "tesouraria_id")
     private Tesouraria tesouraria;
 
-    @Column(name = "data_movimentacao", nullable = false)
+    @Column(name = "data_movimento", nullable = false)
     private LocalDate dataMovimentacao;
 
     @Column(name = "tipo_movimento", nullable = false, length = 20)
