@@ -57,7 +57,7 @@ public class GlobalExceptionHandle {
         ResponseErroDto response = new ResponseErroDto(
                 LocalDateTime.now(),
                 HttpStatus.CONFLICT.value(),
-                "Conflito: Já existe uma tesouraria aberta",
+                "Conflito: erro relacionado a tesouraria",
                 e.getMessage()
         );
         return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
