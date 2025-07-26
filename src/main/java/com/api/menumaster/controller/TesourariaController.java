@@ -1,13 +1,12 @@
 package com.api.menumaster.controller;
 
+import com.api.menumaster.dtos.response.ResponseTesourariaDto;
 import com.api.menumaster.service.TesourariaService;
-import jakarta.websocket.server.PathParam;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -20,9 +19,22 @@ public class TesourariaController {
         this.tesourariaService = tesourariaService;
     }
 
-    @PostMapping
-    public ResponseEntity<?> abrirTesouraria(@RequestParam("abrir") boolean abrir) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return ResponseEntity.ok(tesourariaService.abrirTesouraria(abrir, authentication));
+    @PostMapping("/abrir")
+    public ResponseEntity<ResponseTesourariaDto> abrirTesouraria() {
+        return ResponseEntity.ok(tesourariaService.abrirTesouraria(getAuthentication()));
+    }
+
+    @PostMapping("/fechar")
+    public ResponseEntity<ResponseTesourariaDto> fecharTesouraria(){
+        return ResponseEntity.ok(tesourariaService.fecharTesouraria(getAuthentication()));
+    }
+
+    @PostMapping("/reabrir")
+    public ResponseEntity<ResponseTesourariaDto> reabrirTesouraria(){
+        return ResponseEntity.ok(tesourariaService.reabrirTesouraria(getAuthentication()));
+    }
+
+    private Authentication getAuthentication(){
+        return SecurityContextHolder.getContext().getAuthentication();
     }
 }
