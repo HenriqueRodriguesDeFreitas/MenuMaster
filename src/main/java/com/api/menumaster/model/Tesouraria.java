@@ -1,10 +1,10 @@
 package com.api.menumaster.model;
 
-import com.api.menumaster.model.enums.TipoMovimento;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -41,8 +41,8 @@ public class Tesouraria {
     @Column(name = "usuario_reabertura", length = 20)
     private String usuarioReabertura;
 
-    @OneToMany(mappedBy = "tesouraria")
-    private List<TesourariaMovimentacao> movimentacao;
+    @OneToMany(mappedBy = "tesouraria", cascade = CascadeType.ALL)
+    private List<TesourariaMovimentacao> movimentacao = new ArrayList<>();
 
     public Tesouraria() {
     }
