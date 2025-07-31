@@ -2,11 +2,7 @@ package com.api.menumaster.model;
 
 import jakarta.persistence.*;
 import org.springframework.security.core.CredentialsContainer;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -23,17 +19,21 @@ public class Usuario implements CredentialsContainer {
     @Column(nullable = false)
     private String senha;
 
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinColumn(name = "role_id")
-    private Role role;
+    @OneToMany(mappedBy = "usuario", orphanRemoval = true, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    private List<UsuarioAuthority> authorities = new ArrayList<>();
 
     public Usuario() {
     }
 
-    public Usuario(String nome, String senha, Role role) {
+    public Usuario(String nome, String senha) {
         this.nome = nome;
         this.senha = senha;
-        this.role = role;
+    }
+
+    public Usuario(String nome, String senha, List<UsuarioAuthority> usuarioAuthority) {
+        this.nome = nome;
+        this.senha = senha;
+        this.authorities = usuarioAuthority;
     }
 
     public UUID getId() {
@@ -60,12 +60,13 @@ public class Usuario implements CredentialsContainer {
         this.senha = senha;
     }
 
-    public Role getRole() {
-        return role;
+
+    public List<UsuarioAuthority> getAuthorities() {
+        return authorities;
     }
 
-    public void setRole(Role role) {
-        this.role = role;
+    public void setAuthorities(List<UsuarioAuthority> authorities) {
+        this.authorities = authorities;
     }
 
 
