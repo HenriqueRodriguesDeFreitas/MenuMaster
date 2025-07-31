@@ -50,6 +50,7 @@ public class SecurityConfig {
                 .csrf(crsf -> crsf.disable())
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/authenticate").permitAll()
+                        .requestMatchers("/usuario").permitAll()
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(conf -> conf
                         .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())));
