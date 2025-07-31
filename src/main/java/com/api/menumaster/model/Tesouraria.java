@@ -134,17 +134,25 @@ public class Tesouraria {
             this.saldoFinal = this.saldoInicial;
             return;
         }
-        BigDecimal totalEntrada = movimentacao.stream()
-                .filter(t -> TipoMovimento.ENTRADA.equals(t.getTipoMovimento()))
-                .map(TesourariaMovimentacao::getValor)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal totalEntrada = calcularTotalEntrada(movimentacao);
 
-        BigDecimal totalSaida = movimentacao.stream()
-                .filter(t -> TipoMovimento.SAIDA.equals(t.getTipoMovimento()))
-                .map(TesourariaMovimentacao::getValor)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal totalSaida = calcularTotalSaida(movimentacao);
 
         this.saldoFinal = this.saldoInicial.add(totalEntrada).subtract(totalSaida);
+    }
+
+    private BigDecimal calcularTotalEntrada(List<TesourariaMovimentacao> movimentos) {
+        return movimentos.stream()
+                .filter(t -> "ENTRADA".equals(t.getTipoMovimento()))
+                .map(TesourariaMovimentacao::getValor)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    private BigDecimal calcularTotalSaida(List<TesourariaMovimentacao> movimentos) {
+        return movimentos.stream()
+                .filter(t -> "SAIDA".equals(t.getTipoMovimento()))
+                .map(TesourariaMovimentacao::getValor)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
 }
