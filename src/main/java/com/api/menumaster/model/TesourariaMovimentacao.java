@@ -15,11 +15,11 @@ public class TesourariaMovimentacao {
     private UUID id;
 
     @ManyToOne
-    @JoinColumn(name = "tesouraria_id")
+    @JoinColumn(name = "tesouraria_id", nullable = false)
     private Tesouraria tesouraria;
 
     @Column(name = "data_movimento", nullable = false)
-    private LocalDate dataMovimentacao;
+    private LocalDateTime dataMovimentacao;
 
     @Column(name = "tipo_movimento", nullable = false, length = 20)
     private String tipoMovimento;
@@ -36,7 +36,9 @@ public class TesourariaMovimentacao {
     @Column(length = 20, nullable = false)
     private String usuario;
 
-    public TesourariaMovimentacao(Tesouraria tesouraria, LocalDate dataMovimentacao, String tipoMovimento, String formaPagamento, BigDecimal valor, String usuario, String descricao) {
+    public TesourariaMovimentacao(){}
+
+    public TesourariaMovimentacao(Tesouraria tesouraria, LocalDateTime dataMovimentacao, String tipoMovimento, String formaPagamento, BigDecimal valor, String usuario, String descricao) {
         this.tesouraria = tesouraria;
         this.dataMovimentacao = dataMovimentacao;
         this.tipoMovimento = tipoMovimento;
@@ -58,11 +60,11 @@ public class TesourariaMovimentacao {
         this.tesouraria = tesouraria;
     }
 
-    public LocalDate getDataMovimentacao() {
+    public LocalDateTime getDataMovimentacao() {
         return dataMovimentacao;
     }
 
-    public void setDataMovimentacao(LocalDate dataMovimentacao) {
+    public void setDataMovimentacao(LocalDateTime dataMovimentacao) {
         this.dataMovimentacao = dataMovimentacao;
     }
 
