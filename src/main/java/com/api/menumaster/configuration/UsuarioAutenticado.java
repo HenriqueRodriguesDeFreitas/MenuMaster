@@ -1,15 +1,13 @@
 package com.api.menumaster.configuration;
 
 import com.api.menumaster.model.Usuario;
-import org.springframework.security.core.CredentialsContainer;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
-import java.util.List;
 
-public class UsuarioAutenticado implements UserDetails{
+public class UsuarioAutenticado implements UserDetails {
     private final Usuario usuario;
 
     public UsuarioAutenticado(Usuario usuario) {
