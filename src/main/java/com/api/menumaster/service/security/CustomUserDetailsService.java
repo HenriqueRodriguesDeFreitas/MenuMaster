@@ -22,7 +22,7 @@ public class CustomUserDetailsService implements UserDetailsService {
                 .orElseThrow(()-> new UsernameNotFoundException("Usuário não encontrado."));
 
 
-        UsuarioAutenticado usuarioAutenticado = new UsuarioAutenticado(usuario);
-        return usuarioAutenticado;
+        usuario.getAuthorities().size();
+        return new UsuarioAutenticado(usuario);
     }
 }
