@@ -16,7 +16,9 @@ public class UsuarioAutenticado implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("ROLE_" + usuario.getRole().getNome()));
+        return usuario.getAuthorities().stream()
+                .map(authority -> new SimpleGrantedAuthority(authority.getAuthority().getNome()))
+                .toList();
     }
 
     @Override
