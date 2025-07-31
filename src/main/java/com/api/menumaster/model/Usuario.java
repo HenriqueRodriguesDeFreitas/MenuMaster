@@ -69,6 +69,10 @@ public class Usuario implements CredentialsContainer {
         this.authorities = authorities;
     }
 
+    public void adicionarAuthority(Authority authority) {
+        UsuarioAuthority usuarioAuthority = new UsuarioAuthority(this, authority);
+        this.authorities.add(usuarioAuthority);
+    }
 
     @Override
     public void eraseCredentials() {
