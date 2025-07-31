@@ -2,6 +2,7 @@ package com.api.menumaster.controller;
 
 import com.api.menumaster.dtos.request.RequestUsuarioDto;
 import com.api.menumaster.service.UsuarioService;
+import jakarta.annotation.security.PermitAll;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -21,7 +22,7 @@ public class UsuarioController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'GERENTE', 'LIDER')")
+    @PreAuthorize("asAuthority('USUARIO_CREATE')")
     public ResponseEntity<?> salvar(@RequestBody @Valid RequestUsuarioDto dto){
         return ResponseEntity.ok(usuarioService.salvar(dto));
     }
