@@ -2,9 +2,8 @@ package com.api.menumaster.model;
 
 import jakarta.persistence.*;
 import org.springframework.security.core.CredentialsContainer;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+
+import java.util.*;
 
 @Entity
 @Table(name = "usuario")
@@ -19,8 +18,11 @@ public class Usuario implements CredentialsContainer {
     @Column(nullable = false)
     private String senha;
 
-    @OneToMany(mappedBy = "usuario", orphanRemoval = true, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    private List<UsuarioAuthority> authorities = new ArrayList<>();
+    @Column(name = "is_ativo", nullable = false)
+    private boolean isAtivo;
+
+    @OneToMany(mappedBy = "usuario", orphanRemoval = true, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
+    private Set<UsuarioAuthority> authorities = new HashSet<>();
 
     public Usuario() {
     }
@@ -28,12 +30,14 @@ public class Usuario implements CredentialsContainer {
     public Usuario(String nome, String senha) {
         this.nome = nome;
         this.senha = senha;
+        this.isAtivo = true;
     }
 
-    public Usuario(String nome, String senha, List<UsuarioAuthority> usuarioAuthority) {
+    public Usuario(String nome, String senha, Set<UsuarioAuthority> usuarioAuthority) {
         this.nome = nome;
         this.senha = senha;
         this.authorities = usuarioAuthority;
+        this.isAtivo = true;
     }
 
     public UUID getId() {
@@ -60,12 +64,19 @@ public class Usuario implements CredentialsContainer {
         this.senha = senha;
     }
 
+    public boolean isAtivo() {
+        return isAtivo;
+    }
 
-    public List<UsuarioAuthority> getAuthorities() {
+    public void setAtivo(boolean ativo) {
+        isAtivo = ativo;
+    }
+
+    public Set<UsuarioAuthority> getAuthorities() {
         return authorities;
     }
 
-    public void setAuthorities(List<UsuarioAuthority> authorities) {
+    public void setAuthorities(Set<UsuarioAuthority> authorities) {
         this.authorities = authorities;
     }
 
