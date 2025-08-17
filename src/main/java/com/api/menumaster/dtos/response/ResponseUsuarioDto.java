@@ -7,5 +7,6 @@ public record ResponseUsuarioDto(
         UUID id,
         String nome,
         String senha,
+        boolean isAtivo,
         Set<String> authority) {
 }
