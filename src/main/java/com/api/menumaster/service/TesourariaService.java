@@ -38,9 +38,9 @@ public class TesourariaService {
         Tesouraria tesourariaAberta = tesourariaRepository.findByDataFechamentoIsNull()
                 .orElseThrow(() -> new ConflictTesourariaException("Não existe tesouraria aberta para fechar."));
 
+        tesourariaAberta.calcularSaldoFinal();
         tesourariaAberta.setDataFechamento(LocalDateTime.now());
         tesourariaAberta.setUsuarioFechamento(authentication.getName());
-        tesourariaAberta.calcularSaldoFinal();
 
         return toResponseDto(tesourariaRepository.save(tesourariaAberta));
     }
@@ -77,6 +77,7 @@ public class TesourariaService {
 
         LocalDateTime dataHoraTesourariaFim;
         if (dataFinal != null) {
+            if(dataFinal.isBefore(dataInicial)) throw new ConflictTesourariaException("Data final não pode ser anterior a inicial.");
             dataHoraTesourariaFim = LocalDateTime.of(dataFinal.getYear(), dataFinal.getMonth(), dataFinal.getDayOfMonth(),
                     23, 59, 59);
             tesourarias = tesourariaRepository.findByDataAberturaBetweenOrderByDataAbertura(dataHoraTesourariaInicio, dataHoraTesourariaFim);
@@ -104,7 +105,7 @@ public class TesourariaService {
                         -> tesouraria.getDataAbertura().toLocalDate().equals(hoje.toLocalDate()))
                 .findFirst().ifPresent(t -> {
                     throw new ConflictTesourariaException(
-                            "Existe caixa aberto e fechado hoje. Utilize o endpoint para reabertura");
+                            "Existe tesouraria aberta e fechada hoje. Utilize o endpoint para reabertura.");
                 });
 
 
