@@ -4,7 +4,7 @@ import com.api.menumaster.dtos.response.ResponseTesourariaDto;
 import com.api.menumaster.exception.custom.ConflictTesourariaException;
 import com.api.menumaster.model.Tesouraria;
 import com.api.menumaster.repository.TesourariaRepository;
-import org.apache.coyote.Response;
+import jakarta.transaction.Transactional;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
@@ -13,7 +13,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class TesourariaService {
@@ -24,6 +23,7 @@ public class TesourariaService {
         this.tesourariaRepository = tesourariaRepository;
     }
 
+    @Transactional
     public ResponseTesourariaDto abrirTesouraria(Authentication authentication) {
         validarTesourariaAberta();
         validarTesourariaFechadaParaReabrir();
@@ -33,9 +33,10 @@ public class TesourariaService {
         return toResponseDto(tesourariaRepository.save(tesouraria));
     }
 
+    @Transactional
     public ResponseTesourariaDto fecharTesouraria(Authentication authentication) {
         Tesouraria tesourariaAberta = tesourariaRepository.findByDataFechamentoIsNull()
-                .orElseThrow(() -> new ConflictTesourariaException("Não existe tesouraria aberta para fechar"));
+                .orElseThrow(() -> new ConflictTesourariaException("Não existe tesouraria aberta para fechar."));
 
         tesourariaAberta.setDataFechamento(LocalDateTime.now());
         tesourariaAberta.setUsuarioFechamento(authentication.getName());
@@ -44,9 +45,14 @@ public class TesourariaService {
         return toResponseDto(tesourariaRepository.save(tesourariaAberta));
     }
 
+    @Transactional
     public ResponseTesourariaDto reabrirTesouraria(Authentication authentication) {
         Tesouraria tesouraria = tesourariaRepository.findFirstByDataFechamentoIsNotNullOrderByDataFechamentoDesc()
-                .orElseThrow(() -> new ConflictTesourariaException("Não existe tesouraria para reabrir"));
+                .orElseThrow(() -> new ConflictTesourariaException("Não existe tesouraria para reabrir."));
+
+        if (LocalDateTime.now().isBefore(tesouraria.getDataFechamento())) {
+            throw new ConflictTesourariaException("Erro inesperado, a data de reabertura precisa ser depois do fechamento, contate o suporte.");
+        }
 
         tesouraria.setDataFechamento(null);
         tesouraria.setUsuarioReabertura(authentication.getName());
