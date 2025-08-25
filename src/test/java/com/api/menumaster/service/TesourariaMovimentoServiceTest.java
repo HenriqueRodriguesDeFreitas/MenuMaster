@@ -8,7 +8,7 @@ import com.api.menumaster.model.Tesouraria;
 import com.api.menumaster.model.TesourariaMovimento;
 import com.api.menumaster.model.enums.FormaPagamento;
 import com.api.menumaster.model.enums.TipoMovimento;
-import com.api.menumaster.repository.TesourariaMovimentacaoRepository;
+import com.api.menumaster.repository.TesourariaMovimentoRepository;
 import com.api.menumaster.repository.TesourariaRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,7 +33,7 @@ class TesourariaMovimentoServiceTest {
     @Mock
     private TesourariaRepository tesourariaRepository;
     @Mock
-    private TesourariaMovimentacaoRepository movimentoRepository;
+    private TesourariaMovimentoRepository movimentoRepository;
     @Mock
     private Authentication authentication;
     @Mock
