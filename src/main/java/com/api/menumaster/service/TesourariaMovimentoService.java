@@ -6,7 +6,7 @@ import com.api.menumaster.exception.custom.ConflictTesourariaException;
 import com.api.menumaster.mappper.TesourariaMovimentoMapper;
 import com.api.menumaster.model.TesourariaMovimento;
 import com.api.menumaster.model.enums.TipoMovimento;
-import com.api.menumaster.repository.TesourariaMovimentacaoRepository;
+import com.api.menumaster.repository.TesourariaMovimentoRepository;
 import com.api.menumaster.repository.TesourariaRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.security.core.Authentication;
@@ -18,11 +18,11 @@ import java.time.LocalDateTime;
 public class TesourariaMovimentoService {
 
     private final TesourariaRepository tesourariaRepository;
-    private final TesourariaMovimentacaoRepository movimentacaoRepository;
+    private final TesourariaMovimentoRepository movimentacaoRepository;
     private final TesourariaMovimentoMapper movimentoMapper;
 
     public TesourariaMovimentoService(TesourariaRepository tesourariaRepository,
-                                      TesourariaMovimentacaoRepository movimentacaoRepository,
+                                      TesourariaMovimentoRepository movimentacaoRepository,
                                       TesourariaMovimentoMapper movimentoMapper) {
         this.tesourariaRepository = tesourariaRepository;
         this.movimentacaoRepository = movimentacaoRepository;
