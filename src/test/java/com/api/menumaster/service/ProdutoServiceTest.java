@@ -2,9 +2,11 @@ package com.api.menumaster.service;
 
 import com.api.menumaster.dtos.request.RequestCriaProdutoDto;
 import com.api.menumaster.dtos.request.RequestIngredienteProdutoDto;
+import com.api.menumaster.dtos.response.ResponseIngredienteProdutoDto;
 import com.api.menumaster.dtos.response.ResponseProdutoDto;
 import com.api.menumaster.exception.custom.ConflictEntityException;
 import com.api.menumaster.exception.custom.EntityNotFoundException;
+import com.api.menumaster.mappper.ProdutoMapper;
 import com.api.menumaster.model.Ingrediente;
 import com.api.menumaster.model.IngredienteProduto;
 import com.api.menumaster.model.Produto;
@@ -31,15 +33,16 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class ProdutoServiceTest {
 
-    @Autowired
-    @Mock
-    private ProdutoRepository produtoRepository;
-    @Autowired
     @Mock
     private IngredienteRepository ingredienteRepository;
 
+    @Mock
+    private ProdutoRepository produtoRepository;
+
+    @Mock
+    private ProdutoMapper produtoMapper;
+
     @InjectMocks
-    @Autowired
     private ProdutoService produtoService;
 
     private RequestCriaProdutoDto criaProdutoDto;
@@ -77,6 +80,16 @@ class ProdutoServiceTest {
         ingredienteProduto.setProduto(novoProduto);
 
         novoProduto.setIngredientesAssociados(List.of(ingredienteProduto));
+
+        responseProdutoDto = new ResponseProdutoDto(
+                novoProduto.getNome(),
+                1L,
+                novoProduto.getDescricao(),
+                novoProduto.getPrecoCusto(), // precoCusto calculado
+                novoProduto.getPrecoVenda(), // precoVenda calculado
+                novoProduto.isAtivo(),
+                List.of(new ResponseIngredienteProdutoDto("ingredienteTeste", BigDecimal.valueOf(1)))
+        );
     }
 
     @Test
@@ -85,16 +98,24 @@ class ProdutoServiceTest {
         when(produtoRepository.findByCodigoProduto(anyLong())).thenReturn(Optional.empty());
         when(produtoRepository.save(any(Produto.class))).thenReturn(novoProduto);
         when(ingredienteRepository.findByCodigo(1)).thenReturn(Optional.of(ingredienteSalvo));
+        when(produtoMapper.toResponse(any(Produto.class))).thenReturn(responseProdutoDto);
 
         responseProdutoDto = produtoService.criarProduto(criaProdutoDto);
 
-        assertNotNull(responseProdutoDto, "response não deveria ser nula");
-        assertEquals(responseProdutoDto.nome(), novoProduto.getNome(), "nome não coincide");
-        assertEquals(responseProdutoDto.codigoProduto(), novoProduto.getCodigoProduto(), "codigo não coincide");
-        assertEquals(responseProdutoDto.precoCusto(), novoProduto.getPrecoCusto(), "preço custo não coincide");
-        assertEquals(responseProdutoDto.precoVenda(), novoProduto.getPrecoVenda(), "preço venda não coincide");
-        assertEquals(responseProdutoDto.isAtivo(), novoProduto.isAtivo(), "produto deveria estar ativo");
-        assertEquals(responseProdutoDto.ingredientes().size(), novoProduto.getIngredientesAssociados().size(), "tamanhos não coincidem");
+        assertNotNull(responseProdutoDto,
+                "response não deveria ser nula");
+        assertEquals(responseProdutoDto.nome(), novoProduto.getNome(),
+                "nome não coincide");
+        assertEquals(responseProdutoDto.codigoProduto(), novoProduto.getCodigoProduto(),
+                "codigo não coincide");
+        assertEquals(responseProdutoDto.precoCusto(), novoProduto.getPrecoCusto(),
+                "preço custo não coincide");
+        assertEquals(responseProdutoDto.precoVenda(), novoProduto.getPrecoVenda(),
+                "preço venda não coincide");
+        assertEquals(responseProdutoDto.isAtivo(), novoProduto.isAtivo(),
+                "produto deveria estar ativo");
+        assertEquals(responseProdutoDto.ingredientes().size(), novoProduto.getIngredientesAssociados().size(),
+                "tamanhos não coincidem");
         assertEquals(responseProdutoDto.ingredientes().getFirst().nomeIngrediente(),
                 novoProduto.getIngredientesAssociados().getFirst().getIngrediente().getNome(),
                 "nomes não coincidem");
@@ -150,14 +171,14 @@ class ProdutoServiceTest {
     }
 
     @Test
-    void criarProduto_deveRetornarConflictEntityException_quandoIngredienteAssociadoInativo(){
+    void criarProduto_deveRetornarConflictEntityException_quandoIngredienteAssociadoInativo() {
         when(produtoRepository.findByNomeIgnoreCase(anyString())).thenReturn(Optional.empty());
         when(produtoRepository.findByCodigoProduto(anyLong())).thenReturn(Optional.empty());
         when(ingredienteRepository.findByCodigo(1)).thenReturn(Optional.of(ingredienteSalvo));
 
         ingredienteSalvo.setAtivo(false);
 
-        ConflictEntityException exception = assertThrows(ConflictEntityException.class, ()-> produtoService.criarProduto(criaProdutoDto));
+        ConflictEntityException exception = assertThrows(ConflictEntityException.class, () -> produtoService.criarProduto(criaProdutoDto));
 
         assertEquals("Ingrediente: " + ingredienteSalvo.getNome() + " se encontra inativo",
                 exception.getMessage(), "mensagem de erro não coincide");
