@@ -332,4 +332,66 @@ class ProdutoServiceTest {
     @Test
     void deleteByCodigo() {
     }
+
+    private static void verificacaoDeAssertsList(List<ResponseProdutoDto> responses, List<Produto> produtos) {
+        assertNotNull(responses, "não deveria retornar nulo");
+        assertEquals(responses.getFirst().codigoProduto(),
+                produtos.getFirst().getCodigoProduto(), "codigo não coincide");
+        assertEquals(responses.getFirst().nome(),
+                produtos.getFirst().getNome(), "nome não coincide");
+        assertEquals(responses.getFirst().descricao(),
+                produtos.getFirst().getDescricao(), "descrição não coincide");
+        assertEquals(responses.getFirst().precoCusto(),
+                produtos.getFirst().getPrecoCusto(), "preço de custo não coincide");
+        assertEquals(responses.getFirst().precoVenda(),
+                produtos.getFirst().getPrecoVenda(), "preço de venda não coincide");
+        assertEquals(responses.getFirst().isAtivo(),
+                produtos.getFirst().isAtivo(), "estado do produto não coincide");
+        assertEquals(responses.getFirst().precoVenda(),
+                produtos.getFirst().getPrecoVenda(), "preço de venda não coincide");
+        assertEquals(responses.getFirst().ingredientes().getFirst().nomeIngrediente(),
+                produtos.getFirst().getIngredientesAssociados().getFirst().getIngrediente().getNome(),
+                "nome não coincide");
+        assertEquals(responses.getFirst().ingredientes().getFirst().quantidade(),
+                produtos.getFirst().getIngredientesAssociados().getFirst().getQuantidade()
+                , "quantidade não coincide");
+    }
+
+    private void verificacaoDeAsserts(ResponseProdutoDto responseProdutoDto, Produto novoProduto) {
+        assertNotNull(responseProdutoDto,
+                "response não deveria ser nula");
+        assertEquals(responseProdutoDto.nome(), novoProduto.getNome(),
+                "nome não coincide");
+        assertEquals(responseProdutoDto.codigoProduto(), novoProduto.getCodigoProduto(),
+                "codigo não coincide");
+        assertEquals(responseProdutoDto.precoCusto(), novoProduto.getPrecoCusto(),
+                "preço custo não coincide");
+        assertEquals(responseProdutoDto.precoVenda(), novoProduto.getPrecoVenda(),
+                "preço venda não coincide");
+        assertEquals(responseProdutoDto.isAtivo(), novoProduto.isAtivo(),
+                "produto deveria estar ativo");
+        assertEquals(responseProdutoDto.ingredientes().size(), novoProduto.getIngredientesAssociados().size(),
+                "tamanhos não coincidem");
+        assertEquals(responseProdutoDto.ingredientes().getFirst().nomeIngrediente(),
+                novoProduto.getIngredientesAssociados().getFirst().getIngrediente().getNome(),
+                "nomes não coincidem");
+        assertEquals(responseProdutoDto.ingredientes().getFirst().quantidade(),
+                novoProduto.getIngredientesAssociados().getFirst().getQuantidade(),
+                "quantidades não coincidem");
+    }
+
+    private static ResponseProdutoDto responseProdutoDtoComDadosAtualizados(Produto p) {
+        return new ResponseProdutoDto(
+                p.getNome(),
+                p.getCodigoProduto(),
+                p.getDescricao(),
+                p.getPrecoCusto(),
+                p.getPrecoVenda(),
+                p.isAtivo(),
+                List.of(new ResponseIngredienteProdutoDto(
+                        p.getIngredientesAssociados().get(0).getIngrediente().getNome(),
+                        p.getIngredientesAssociados().get(0).getQuantidade()
+                ))
+        );
+    }
 }
