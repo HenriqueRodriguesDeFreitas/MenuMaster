@@ -179,7 +179,130 @@ class ProdutoServiceTest {
     }
 
     @Test
-    void atualizarProduto() {
+    void atualizarProduto_deveRetornarResponseProdutoDto_quandoSucesso() {
+        when(produtoRepository.findByCodigoProduto(1L)).thenReturn(Optional.of(novoProduto));
+        when(produtoRepository.findByNomeIgnoreCase("novoNome")).thenReturn(Optional.empty());
+        when(ingredienteRepository.findByCodigo(1)).thenReturn(Optional.of(ingredienteSalvo));
+        when(produtoRepository.save(any(Produto.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(produtoMapper.toResponse(any(Produto.class))).thenAnswer(invocation -> {
+            Produto p = invocation.getArgument(0);
+            return responseProdutoDtoComDadosAtualizados(p);
+        });
+
+        ResponseProdutoDto response = produtoService.atualizarProduto(1L, requestAtualizarProdutoDto);
+
+
+        novoProduto.setNome("novoNome");
+        novoProduto.setDescricao("novaDescricao");
+        novoProduto.setAtivo(false);
+
+        verificacaoDeAsserts(response, novoProduto);
+
+        verify(produtoRepository, times(1)).findByCodigoProduto(1L);
+        verify(produtoRepository, times(1)).findByNomeIgnoreCase("novoNome");
+        verify(ingredienteRepository, times(1)).findByCodigo(1);
+        verify(produtoRepository, times(1)).save(any(Produto.class));
+        verify(produtoMapper, times(1)).toResponse(any(Produto.class));
+        verifyNoMoreInteractions(produtoRepository, ingredienteRepository, produtoMapper);
+    }
+
+    @Test
+    void atualizarProduto_deveRetornarEntityNotFoundException_quandoProdutoNaoEncontradoComCodigoPassado() {
+        when(produtoRepository.findByCodigoProduto(1L)).thenReturn(Optional.empty());
+
+        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class,
+                () -> produtoService.atualizarProduto(1L, requestAtualizarProdutoDto));
+
+        assertEquals("Produto não encontrado", exception.getMessage(), "mensagem não coincide");
+        verify(produtoRepository, times(1)).findByCodigoProduto(1L);
+        verifyNoMoreInteractions(produtoRepository);
+    }
+
+    @Test
+    void atualizarProduto_deveRetornarConflictEntityException_quandoExisteProdutoComNomePassado() {
+        Produto produtoCadastrado = new Produto();
+        produtoCadastrado.setId(UUID.randomUUID());
+        produtoCadastrado.setCodigoProduto(criaProdutoDto.codigoProduto());
+        produtoCadastrado.setNome("novoNome");
+        produtoCadastrado.setDescricao(criaProdutoDto.descricao());
+        produtoCadastrado.setAtivo(true);
+        produtoCadastrado.setQuantidadeVendida(BigDecimal.ZERO);
+        produtoCadastrado.setUnidadeMedida(criaProdutoDto.unidadeMedida());
+
+        when(produtoRepository.findByCodigoProduto(1L)).thenReturn(Optional.of(novoProduto));
+        when(produtoRepository.findByNomeIgnoreCase("novoNome")).thenReturn(
+                Optional.of(produtoCadastrado));
+
+        ConflictEntityException exception = assertThrows(ConflictEntityException.class,
+                () -> produtoService.atualizarProduto(1L, requestAtualizarProdutoDto));
+
+        assertEquals("Já existe um produto com este nome", exception.getMessage(),
+                "mensagem não coincide");
+        verify(produtoRepository, times(1)).findByCodigoProduto(1L);
+        verify(produtoRepository, times(1)).findByNomeIgnoreCase("novoNome");
+        verifyNoMoreInteractions(produtoRepository);
+    }
+
+    @Test
+    void atualizarProduto_deveRetornarEntityNotFoundException_quandoIngredienteAssociadoNaoEncontrado() {
+        when(produtoRepository.findByCodigoProduto(1L)).thenReturn(Optional.of(novoProduto));
+        when(produtoRepository.findByNomeIgnoreCase("novoNome")).thenReturn(Optional.empty());
+        when(ingredienteRepository.findByCodigo(1)).thenReturn(Optional.empty());
+
+        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class,
+                () -> produtoService.atualizarProduto(1L, requestAtualizarProdutoDto));
+
+        assertEquals("Ingrediente não encontrado", exception.getMessage(), "mensagem não coincide");
+        verify(produtoRepository, times(1)).findByCodigoProduto(1L);
+        verify(produtoRepository, times(1)).findByNomeIgnoreCase("novoNome");
+        verify(ingredienteRepository, times(1)).findByCodigo(1);
+        verifyNoMoreInteractions(produtoRepository);
+        verifyNoMoreInteractions(ingredienteRepository);
+    }
+
+    @Test
+    void atualizarProduto_deveRetornarConflictEntityException_quandoIngredienteAssociadoInativo(){
+        when(produtoRepository.findByCodigoProduto(1L)).thenReturn(Optional.of(novoProduto));
+        when(produtoRepository.findByNomeIgnoreCase("novoNome")).thenReturn(Optional.empty());
+        when(ingredienteRepository.findByCodigo(1)).thenReturn(Optional.of(ingredienteSalvo));
+
+        ingredienteSalvo.setAtivo(false);
+
+        ConflictEntityException exception = assertThrows(ConflictEntityException.class,
+                ()-> produtoService.atualizarProduto(1L, requestAtualizarProdutoDto));
+
+        assertEquals("Ingrediente: " + ingredienteSalvo.getNome() + " se encontra inativo", exception.getMessage(),
+                 "mensagem não coincide");
+        verify(produtoRepository, times(1)).findByCodigoProduto(1L);
+        verify(produtoRepository, times(1)).findByNomeIgnoreCase("novoNome");
+        verify(ingredienteRepository, times(1)).findByCodigo(1);
+        verifyNoMoreInteractions(produtoRepository);
+        verifyNoMoreInteractions(ingredienteRepository);
+    }
+
+    @Test
+    void findAll_deveRetornarListaDeResponseProdutoDto_quandoSucesso() {
+        List<Produto> produtos = List.of(novoProduto);
+        when(produtoRepository.findAll()).thenReturn(produtos);
+        when(produtoMapper.toResponse(any(Produto.class))).thenReturn(responseProdutoDto);
+
+        List<ResponseProdutoDto> responses;
+        responses = produtoService.findAll();
+
+        verificacaoDeAssertsList(responses, produtos);
+        verify(produtoRepository, times(1)).findAll();
+        verify(produtoMapper, times(1)).toResponse(any(Produto.class));
+        verifyNoMoreInteractions(produtoRepository);
+        verifyNoMoreInteractions(produtoMapper);
+    }
+
+    @Test
+    void findAll_deveRetornarListVazia_quandoNenhumProdutoEncontrado() {
+        when(produtoRepository.findAll()).thenReturn(List.of());
+
+        List<ResponseProdutoDto> responses = produtoService.findAll();
+
+        assertTrue(responses.isEmpty(), "retorno deveria ser nulo");
     }
 
     @Test
