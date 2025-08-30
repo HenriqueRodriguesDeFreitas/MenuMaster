@@ -2,11 +2,11 @@ package com.api.menumaster.service;
 
 import com.api.menumaster.dtos.request.RequestAtualizarProdutoDto;
 import com.api.menumaster.dtos.request.RequestCriaProdutoDto;
-import com.api.menumaster.dtos.response.ResponseIngredienteProdutoDto;
 import com.api.menumaster.dtos.response.ResponseProdutoDto;
 import com.api.menumaster.exception.custom.ConflictEntityException;
 import com.api.menumaster.exception.custom.EntityNotFoundException;
 import com.api.menumaster.exception.custom.ProdutoVinculadoAPedidoException;
+import com.api.menumaster.mappper.ProdutoMapper;
 import com.api.menumaster.model.Ingrediente;
 import com.api.menumaster.model.IngredienteProduto;
 import com.api.menumaster.model.Produto;
@@ -24,11 +24,14 @@ public class ProdutoService {
 
     private final ProdutoRepository produtoRepository;
     private final IngredienteRepository ingredienteRepository;
+    private final ProdutoMapper produtoMapper;
 
     public ProdutoService(ProdutoRepository produtoRepository,
-                          IngredienteRepository ingredienteRepository) {
+                          IngredienteRepository ingredienteRepository,
+                          ProdutoMapper produtoMapper) {
         this.produtoRepository = produtoRepository;
         this.ingredienteRepository = ingredienteRepository;
+        this.produtoMapper = produtoMapper;
     }
 
     @Transactional
@@ -66,7 +69,7 @@ public class ProdutoService {
                 .orElseThrow(() -> new EntityNotFoundException("Produto não encontrado"));
 
         produtoRepository.findByNomeIgnoreCase(dto.nome()).ifPresent(p -> {
-            if(!p.getNome().equals(produto.getNome())){
+            if (!p.getNome().equals(produto.getNome())) {
                 throw new ConflictEntityException("Já existe um produto com este nome");
             }
         });
@@ -155,15 +158,13 @@ public class ProdutoService {
     }
 
     private ResponseProdutoDto converterObjetoParaDto(Produto produto) {
-        List<ResponseIngredienteProdutoDto> ingredientesDoProduto = produto.getIngredientesAssociados().stream()
-                .map(i -> new ResponseIngredienteProdutoDto(i.getIngrediente().getNome(), i.getQuantidade())).toList();
-
-        return new ResponseProdutoDto(produto.getNome(), produto.getCodigoProduto(), produto.getDescricao(),
-                produto.getPrecoCusto(), produto.getPrecoVenda(), produto.isAtivo(), ingredientesDoProduto);
+        return produtoMapper.toResponse(produto);
     }
 
     private List<ResponseProdutoDto> converterObjetoParaDto(List<Produto> produtos) {
-        return produtos.stream().map(this::converterObjetoParaDto).toList();
+        List<ResponseProdutoDto> response = new ArrayList<>();
+        produtos.forEach(i -> response.add(produtoMapper.toResponse(i)));
+        return response;
     }
 
     private void processarIngredientesDoProduto(RequestCriaProdutoDto dto, Produto produto,
