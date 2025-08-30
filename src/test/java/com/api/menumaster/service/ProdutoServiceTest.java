@@ -1,5 +1,6 @@
 package com.api.menumaster.service;
 
+import com.api.menumaster.dtos.request.RequestAtualizarProdutoDto;
 import com.api.menumaster.dtos.request.RequestCriaProdutoDto;
 import com.api.menumaster.dtos.request.RequestIngredienteProdutoDto;
 import com.api.menumaster.dtos.response.ResponseIngredienteProdutoDto;
@@ -19,12 +20,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -50,6 +48,8 @@ class ProdutoServiceTest {
     private RequestIngredienteProdutoDto ingredienteProdutoDto;
     private Produto novoProduto;
     private Ingrediente ingredienteSalvo;
+    IngredienteProduto ingredienteProduto;
+    RequestAtualizarProdutoDto requestAtualizarProdutoDto;
 
     @BeforeEach
     void setUp() {
@@ -74,12 +74,14 @@ class ProdutoServiceTest {
         novoProduto.setQuantidadeVendida(BigDecimal.ZERO);
         novoProduto.setUnidadeMedida(criaProdutoDto.unidadeMedida());
 
-        IngredienteProduto ingredienteProduto = new IngredienteProduto();
+        ingredienteProduto = new IngredienteProduto();
         ingredienteProduto.setIngrediente(ingredienteSalvo);
         ingredienteProduto.setQuantidade(BigDecimal.valueOf(1));
         ingredienteProduto.setProduto(novoProduto);
 
-        novoProduto.setIngredientesAssociados(List.of(ingredienteProduto));
+        novoProduto.setIngredientesAssociados(new ArrayList<>());
+        novoProduto.getIngredientesAssociados().add(ingredienteProduto);
+
 
         responseProdutoDto = new ResponseProdutoDto(
                 novoProduto.getNome(),
@@ -90,6 +92,12 @@ class ProdutoServiceTest {
                 novoProduto.isAtivo(),
                 List.of(new ResponseIngredienteProdutoDto("ingredienteTeste", BigDecimal.valueOf(1)))
         );
+
+        requestAtualizarProdutoDto = new RequestAtualizarProdutoDto(
+                "novoNome",
+                "novaDescricao",
+                false,
+                List.of(ingredienteProdutoDto));
     }
 
     @Test
@@ -102,26 +110,7 @@ class ProdutoServiceTest {
 
         responseProdutoDto = produtoService.criarProduto(criaProdutoDto);
 
-        assertNotNull(responseProdutoDto,
-                "response não deveria ser nula");
-        assertEquals(responseProdutoDto.nome(), novoProduto.getNome(),
-                "nome não coincide");
-        assertEquals(responseProdutoDto.codigoProduto(), novoProduto.getCodigoProduto(),
-                "codigo não coincide");
-        assertEquals(responseProdutoDto.precoCusto(), novoProduto.getPrecoCusto(),
-                "preço custo não coincide");
-        assertEquals(responseProdutoDto.precoVenda(), novoProduto.getPrecoVenda(),
-                "preço venda não coincide");
-        assertEquals(responseProdutoDto.isAtivo(), novoProduto.isAtivo(),
-                "produto deveria estar ativo");
-        assertEquals(responseProdutoDto.ingredientes().size(), novoProduto.getIngredientesAssociados().size(),
-                "tamanhos não coincidem");
-        assertEquals(responseProdutoDto.ingredientes().getFirst().nomeIngrediente(),
-                novoProduto.getIngredientesAssociados().getFirst().getIngrediente().getNome(),
-                "nomes não coincidem");
-        assertEquals(responseProdutoDto.ingredientes().getFirst().quantidade(),
-                novoProduto.getIngredientesAssociados().getFirst().getQuantidade(),
-                "quantidades não coincidem");
+        verificacaoDeAsserts(responseProdutoDto, novoProduto);
 
         verify(produtoRepository, times(1)).findByNomeIgnoreCase(anyString());
         verify(produtoRepository, times(1)).findByCodigoProduto(anyLong());
