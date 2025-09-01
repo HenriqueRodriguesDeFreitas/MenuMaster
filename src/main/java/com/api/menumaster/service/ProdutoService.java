@@ -101,6 +101,17 @@ public class ProdutoService {
         return converterObjetoParaDto(produtos);
     }
 
+    public List<ResponseProdutoDto> findByPrecoCusto(BigDecimal precoCusto) {
+        if (precoCusto == null) {
+            throw new IllegalArgumentException("O valor de preço de custo não pode ser nulo.");
+        }
+        if (precoCusto.compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException("O valor de preço de custo não pode ser negativo.");
+        }
+        return converterObjetoParaDto(produtoRepository.findByPrecoCusto(precoCusto));
+
+    }
+
     public List<ResponseProdutoDto> findByPrecoCustoBetween(BigDecimal precoCustoInicial, BigDecimal precoCustoFinal) {
         List<Produto> produtos = new ArrayList<>();
         if (precoCustoInicial == null || precoCustoInicial.compareTo(BigDecimal.ZERO) < 0) {
