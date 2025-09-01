@@ -105,9 +105,7 @@ public class ProdutoService {
         if (precoCusto == null) {
             throw new IllegalArgumentException("O valor de preço de custo não pode ser nulo.");
         }
-        if (precoCusto.compareTo(BigDecimal.ZERO) < 0) {
-            throw new IllegalArgumentException("O valor de preço de custo não pode ser negativo.");
-        }
+        validaSeValoresSaoPositivos(null, precoCusto);
         return converterObjetoParaDto(produtoRepository.findByPrecoCusto(precoCusto));
 
     }
@@ -116,14 +114,8 @@ public class ProdutoService {
         if (precoCustoInicial == null) throw new IllegalArgumentException("Preço inicial não pode ser nulo.");
         if (precoCustoFinal == null) throw new IllegalArgumentException("Preço final não pode ser nulo.");
 
-        if (precoCustoInicial.compareTo(BigDecimal.ZERO) < 0)
-            throw new IllegalArgumentException("Preço inicial não pode ser negativo.");
-
-        if (precoCustoFinal.compareTo(BigDecimal.ZERO) < 0)
-            throw new IllegalArgumentException("Preço final não pode ser negativo.");
-
-        if (precoCustoInicial.compareTo(precoCustoFinal) > 0)
-            throw new IllegalArgumentException("Preço inicial não pode ser maior que o preço final.");
+        validaSeValoresSaoPositivos(precoCustoInicial, precoCustoFinal);
+        validaSeValorInicialMenorQueFinal(precoCustoInicial, precoCustoFinal);
 
         return converterObjetoParaDto(produtoRepository.findByPrecoCustoBetween(precoCustoInicial, precoCustoFinal));
     }
@@ -137,14 +129,10 @@ public class ProdutoService {
             precoVendaFinal = BigDecimal.ZERO;
         }
 
-        if (precoVendaInicial.compareTo(BigDecimal.ZERO) == 0 && precoVendaFinal.compareTo(BigDecimal.ZERO) > 0) {
-            produtos = produtoRepository.findByPrecoVendaBetween(BigDecimal.ZERO, precoVendaFinal);
-        }
-        if (precoVendaInicial.compareTo(BigDecimal.ZERO) >= 0 && precoVendaFinal.compareTo(BigDecimal.ZERO) == 0) {
-            produtos = produtoRepository.findByPrecoVenda(precoVendaInicial);
-        }
-
-        return converterObjetoParaDto(produtos);
+        validaSeValoresSaoPositivos(precoVendaInicial, precoVendaFinal);
+        validaSeValorInicialMenorQueFinal(precoVendaInicial, precoVendaFinal);
+        return converterObjetoParaDto(produtoRepository.findByPrecoVendaBetween(precoVendaInicial,
+                precoVendaFinal));
     }
 
     public List<ResponseProdutoDto> findByProdutosAtivos() {
