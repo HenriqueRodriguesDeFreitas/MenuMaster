@@ -110,6 +110,12 @@ public class ProdutoService {
 
     }
 
+    public List<ResponseProdutoDto> findByPrecoVenda(BigDecimal precoVenda) {
+        if (precoVenda == null) throw new IllegalArgumentException("O valor de preço de venda não pode ser nulo");
+        validaSeValoresSaoPositivos(precoVenda, null);
+        return converterObjetoParaDto(produtoRepository.findByPrecoVenda(precoVenda));
+    }
+
     public List<ResponseProdutoDto> findByPrecoCustoBetween(BigDecimal precoCustoInicial, BigDecimal precoCustoFinal) {
         if (precoCustoInicial == null) throw new IllegalArgumentException("Preço inicial não pode ser nulo.");
         if (precoCustoFinal == null) throw new IllegalArgumentException("Preço final não pode ser nulo.");
@@ -120,14 +126,10 @@ public class ProdutoService {
         return converterObjetoParaDto(produtoRepository.findByPrecoCustoBetween(precoCustoInicial, precoCustoFinal));
     }
 
-    public List<ResponseProdutoDto> findByPrecoVendaBetween(BigDecimal precoVendaInicial, BigDecimal precoVendaFinal) {
-        List<Produto> produtos = new ArrayList<>();
-        if (precoVendaInicial == null || precoVendaInicial.compareTo(BigDecimal.ZERO) < 0) {
-            precoVendaInicial = BigDecimal.ZERO;
-        }
-        if (precoVendaFinal == null || precoVendaFinal.compareTo(BigDecimal.ZERO) < 0) {
-            precoVendaFinal = BigDecimal.ZERO;
-        }
+    public List<ResponseProdutoDto> findByPrecoVendaBetween(BigDecimal precoVendaInicial,
+                                                            BigDecimal precoVendaFinal) {
+        if (precoVendaInicial == null) throw new IllegalArgumentException("Preço inicial não pode ser nulo.");
+        if (precoVendaFinal == null) throw new IllegalArgumentException("Preço final não pode ser nulo.");
 
         validaSeValoresSaoPositivos(precoVendaInicial, precoVendaFinal);
         validaSeValorInicialMenorQueFinal(precoVendaInicial, precoVendaFinal);
