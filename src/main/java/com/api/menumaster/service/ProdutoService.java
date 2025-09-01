@@ -209,4 +209,19 @@ public class ProdutoService {
             listaExistente.add(ingredienteProduto);
         });
     }
+
+    private static void validaSeValoresSaoPositivos(BigDecimal valorInicial,
+                                                    BigDecimal valorFinal) {
+        if (valorInicial != null && valorInicial.compareTo(BigDecimal.ZERO) < 0)
+            throw new IllegalArgumentException("Valor inicial não pode ser negativo.");
+
+        if (valorFinal != null && valorFinal.compareTo(BigDecimal.ZERO) < 0)
+            throw new IllegalArgumentException("Valor final não pode ser negativo.");
+    }
+
+    private static void validaSeValorInicialMenorQueFinal(BigDecimal valorInicial,
+                                                          BigDecimal valorFinal) {
+        if (valorInicial.compareTo(valorFinal) > 0)
+            throw new IllegalArgumentException("Valor inicial não pode ser maior que o preço final.");
+    }
 }
