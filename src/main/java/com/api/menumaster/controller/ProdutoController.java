@@ -2,6 +2,7 @@ package com.api.menumaster.controller;
 
 import com.api.menumaster.dtos.request.RequestAtualizarProdutoDto;
 import com.api.menumaster.dtos.request.RequestCriaProdutoDto;
+import com.api.menumaster.dtos.response.ResponseProdutoDto;
 import com.api.menumaster.service.ProdutoService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -23,68 +24,80 @@ public class ProdutoController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'GERENTE', 'LIDER')")
-    public ResponseEntity<?> criarProduto(@RequestBody @Valid RequestCriaProdutoDto dto) {
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'PRODUTO_CREATE')")
+    public ResponseEntity<ResponseProdutoDto> criarProduto(@RequestBody @Valid RequestCriaProdutoDto dto) {
         return ResponseEntity.ok(produtoService.criarProduto(dto));
     }
 
     @PutMapping("/{codigoProduto}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'GERENTE', 'LIDER')")
-    public ResponseEntity<?> atualizarProduto(@PathVariable("codigoProduto") Long codigoProduto,
-                                              @RequestBody RequestAtualizarProdutoDto dto) {
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'PRODUTO_UPDATE')")
+    public ResponseEntity<ResponseProdutoDto> atualizarProduto(@PathVariable("codigoProduto") Long codigoProduto,
+                                                               @RequestBody RequestAtualizarProdutoDto dto) {
         return ResponseEntity.ok(produtoService.atualizarProduto(codigoProduto, dto));
     }
 
     @GetMapping("byCodigo/{codigo}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'GERENTE', 'LIDER', 'OPERADOR')")
-    public ResponseEntity<?> buscarPorCodigo(@PathVariable("codigo") Long codigo) {
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'PRODUTO_READ')")
+    public ResponseEntity<ResponseProdutoDto> buscarPorCodigo(@PathVariable("codigo") Long codigo) {
         return ResponseEntity.ok(produtoService.findByCodigo(codigo));
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'GERENTE', 'LIDER', 'OPERADOR')")
-    public ResponseEntity<List<?>> findAll() {
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'PRODUTO_READ')")
+    public ResponseEntity<List<ResponseProdutoDto>> findAll() {
         return ResponseEntity.ok(produtoService.findAll());
     }
 
     @GetMapping("/byNome/{nome}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'GERENTE', 'LIDER', 'OPERADOR')")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'PRODUTO_READ')")
     public ResponseEntity<List<?>> findByNome(@PathVariable("nome") String nome) {
         return ResponseEntity.ok(produtoService.findByNome(nome));
     }
 
     @GetMapping("/byPrecoCusto")
-    @PreAuthorize("hasAnyRole('ADMIN', 'GERENTE', 'LIDER')")
-    public ResponseEntity<List<?>> findByPrecoCustoBetween(@RequestParam BigDecimal precoCustoInicio,
-                                                           @RequestParam BigDecimal precoCustoFinal) {
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'PRODUTO_READ')")
+    public ResponseEntity<List<ResponseProdutoDto>> findByPrecoCusto(@RequestParam BigDecimal precoCusto) {
+        return ResponseEntity.ok(produtoService.findByPrecoCusto(precoCusto));
+    }
+
+    @GetMapping("/byPrecoCustoBetween")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'PRODUTO_READ')")
+    public ResponseEntity<List<ResponseProdutoDto>> findByPrecoCustoBetween(@RequestParam BigDecimal precoCustoInicio,
+                                                                            @RequestParam BigDecimal precoCustoFinal) {
         return ResponseEntity.ok(produtoService.findByPrecoCustoBetween(precoCustoInicio,
                 precoCustoFinal));
     }
 
     @GetMapping("/byPrecoVenda")
-    @PreAuthorize("hasAnyRole('ADMIN', 'GERENTE', 'LIDER')")
-    public ResponseEntity<List<?>> findByPrecoVendaBetween(@RequestParam BigDecimal precoVendaInicio,
-                                                           @RequestParam BigDecimal precoVendaFinal) {
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'PRODUTO_READ')")
+    public ResponseEntity<List<ResponseProdutoDto>> findByPrecoVenda(@RequestParam BigDecimal precoVenda) {
+        return ResponseEntity.ok(produtoService.findByPrecoVenda(precoVenda));
+    }
+
+    @GetMapping("/byPrecoVendaBetween")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'PRODUTO_READ')")
+    public ResponseEntity<List<ResponseProdutoDto>> findByPrecoVendaBetween(@RequestParam BigDecimal precoVendaInicio,
+                                                                            @RequestParam BigDecimal precoVendaFinal) {
         return ResponseEntity.ok(produtoService.findByPrecoVendaBetween(precoVendaInicio,
                 precoVendaFinal));
     }
 
     @GetMapping("/byAtivos")
-    @PreAuthorize("hasAnyRole('ADMIN', 'GERENTE', 'LIDER', 'OPERADOR')")
-    public ResponseEntity<List<?>> findByProdutosAtivos() {
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'PRODUTO_READ')")
+    public ResponseEntity<List<ResponseProdutoDto>> findByProdutosAtivos() {
         return ResponseEntity.ok(produtoService.findByProdutosAtivos());
     }
 
     @GetMapping("/byInativos")
-    @PreAuthorize("hasAnyRole('ADMIN', 'GERENTE', 'LIDER', 'OPERADOR')")
-    public ResponseEntity<List<?>> findByProdutosInativos() {
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'PRODUTO_READ')")
+    public ResponseEntity<List<ResponseProdutoDto>> findByProdutosInativos() {
         return ResponseEntity.ok(produtoService.findByProdutosInativos());
     }
 
     @DeleteMapping("/{codigoProduto}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'GERENTE', 'LIDER')")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'PRODUTO_DELETE')")
     public ResponseEntity<Void> deleteByCodigo(@PathVariable("codigoProduto") Long codigoProduto) {
         produtoService.deleteByCodigo(codigoProduto);
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }
