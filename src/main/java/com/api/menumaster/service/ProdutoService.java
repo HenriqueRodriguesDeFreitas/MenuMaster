@@ -113,23 +113,19 @@ public class ProdutoService {
     }
 
     public List<ResponseProdutoDto> findByPrecoCustoBetween(BigDecimal precoCustoInicial, BigDecimal precoCustoFinal) {
-        List<Produto> produtos = new ArrayList<>();
-        if (precoCustoInicial == null || precoCustoInicial.compareTo(BigDecimal.ZERO) < 0) {
-            precoCustoInicial = BigDecimal.ZERO;
-        }
-        if (precoCustoFinal == null || precoCustoFinal.compareTo(BigDecimal.ZERO) < 0) {
-            precoCustoFinal = BigDecimal.ZERO;
-        }
+        if (precoCustoInicial == null) throw new IllegalArgumentException("Preço inicial não pode ser nulo.");
+        if (precoCustoFinal == null) throw new IllegalArgumentException("Preço final não pode ser nulo.");
 
-        if (precoCustoInicial.compareTo(BigDecimal.ZERO) == 0 && precoCustoFinal.compareTo(BigDecimal.ZERO) >= 0) {
-            produtos = produtoRepository.findByPrecoCustoBetween(BigDecimal.ZERO, precoCustoFinal);
-        }
-        if (precoCustoInicial.compareTo(BigDecimal.ZERO) >= 0 && precoCustoFinal.compareTo(BigDecimal.ZERO) == 0) {
-            produtos = produtoRepository.findByPrecoCusto(precoCustoInicial);
-        }
+        if (precoCustoInicial.compareTo(BigDecimal.ZERO) < 0)
+            throw new IllegalArgumentException("Preço inicial não pode ser negativo.");
 
+        if (precoCustoFinal.compareTo(BigDecimal.ZERO) < 0)
+            throw new IllegalArgumentException("Preço final não pode ser negativo.");
 
-        return converterObjetoParaDto(produtos);
+        if (precoCustoInicial.compareTo(precoCustoFinal) > 0)
+            throw new IllegalArgumentException("Preço inicial não pode ser maior que o preço final.");
+
+        return converterObjetoParaDto(produtoRepository.findByPrecoCustoBetween(precoCustoInicial, precoCustoFinal));
     }
 
     public List<ResponseProdutoDto> findByPrecoVendaBetween(BigDecimal precoVendaInicial, BigDecimal precoVendaFinal) {
