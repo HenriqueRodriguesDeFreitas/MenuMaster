@@ -261,7 +261,7 @@ class ProdutoServiceTest {
     }
 
     @Test
-    void atualizarProduto_deveRetornarConflictEntityException_quandoIngredienteAssociadoInativo(){
+    void atualizarProduto_deveRetornarConflictEntityException_quandoIngredienteAssociadoInativo() {
         when(produtoRepository.findByCodigoProduto(1L)).thenReturn(Optional.of(novoProduto));
         when(produtoRepository.findByNomeIgnoreCase("novoNome")).thenReturn(Optional.empty());
         when(ingredienteRepository.findByCodigo(1)).thenReturn(Optional.of(ingredienteSalvo));
@@ -269,10 +269,10 @@ class ProdutoServiceTest {
         ingredienteSalvo.setAtivo(false);
 
         ConflictEntityException exception = assertThrows(ConflictEntityException.class,
-                ()-> produtoService.atualizarProduto(1L, requestAtualizarProdutoDto));
+                () -> produtoService.atualizarProduto(1L, requestAtualizarProdutoDto));
 
         assertEquals("Ingrediente: " + ingredienteSalvo.getNome() + " se encontra inativo", exception.getMessage(),
-                 "mensagem não coincide");
+                "mensagem não coincide");
         verify(produtoRepository, times(1)).findByCodigoProduto(1L);
         verify(produtoRepository, times(1)).findByNomeIgnoreCase("novoNome");
         verify(ingredienteRepository, times(1)).findByCodigo(1);
@@ -306,7 +306,26 @@ class ProdutoServiceTest {
     }
 
     @Test
-    void findByCodigo() {
+    void findByCodigo_deveRetornarDeResponseProdutoDto_quandoSuceso() {
+        when(produtoRepository.findByCodigoProduto(1L)).thenReturn(Optional.of(novoProduto));
+        when(produtoMapper.toResponse(any(Produto.class))).thenReturn(responseProdutoDto);
+
+        responseProdutoDto = produtoService.findByCodigo(1L);
+
+        verificacaoDeAsserts(responseProdutoDto, novoProduto);
+        verify(produtoRepository, times(1)).findByCodigoProduto(1L);
+        verifyNoMoreInteractions(produtoRepository);
+    }
+
+    @Test
+    void findByCodigo_deveRetornarEntityNotFoundException_quandoProdutoNaoEncontrado() {
+        when(produtoRepository.findByCodigoProduto(1L)).thenReturn(Optional.empty());
+
+        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class,
+                () -> produtoService.findByCodigo(1L));
+
+        assertEquals("Produto não encontrado", exception.getMessage());
+        verifyNoMoreInteractions(produtoRepository);
     }
 
     @Test
