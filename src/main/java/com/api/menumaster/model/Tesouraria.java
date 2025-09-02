@@ -1,5 +1,6 @@
 package com.api.menumaster.model;
 
+import com.api.menumaster.exception.custom.ConflictTesourariaException;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
@@ -42,8 +43,10 @@ public class Tesouraria {
     private String usuarioReabertura;
 
     @OneToMany(mappedBy = "tesouraria", cascade = CascadeType.ALL)
-    private List<TesourariaMovimentacao> movimentacao = new ArrayList<>();
+    private List<TesourariaMovimento> movimentacao = new ArrayList<>();
 
+    @OneToMany(mappedBy = "tesouraria")
+    private List<Caixa> caixas = new ArrayList<>();
     public Tesouraria() {
     }
 
@@ -55,6 +58,10 @@ public class Tesouraria {
 
     public UUID getId() {
         return id;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
     }
 
     public LocalDateTime getDataAbertura() {
@@ -105,11 +112,11 @@ public class Tesouraria {
         this.usuarioFechamento = usuarioFechamento;
     }
 
-    public List<TesourariaMovimentacao> getMovimentacao() {
+    public List<TesourariaMovimento> getMovimentacao() {
         return movimentacao;
     }
 
-    public void setMovimentacao(List<TesourariaMovimentacao> movimentacao) {
+    public void setMovimentacao(List<TesourariaMovimento> movimentacao) {
         this.movimentacao = movimentacao;
     }
 
@@ -129,30 +136,49 @@ public class Tesouraria {
         this.dataReabertura = dataReabertura;
     }
 
+    public List<Caixa> getCaixas() {
+        return caixas;
+    }
+
+    public void setCaixas(List<Caixa> caixas) {
+        this.caixas = caixas;
+    }
+
     public void calcularSaldoFinal() {
-        if (movimentacao == null || movimentacao.isEmpty()) {
+        if (movimentacao == null || movimentacao.isEmpty() && caixas == null || caixas.isEmpty()) {
             this.saldoFinal = this.saldoInicial;
             return;
         }
+
+        BigDecimal totalSaldoFinalCaixas = calcularSaldoFinalCaixasFechados();
+
         BigDecimal totalEntrada = calcularTotalEntrada(movimentacao);
 
         BigDecimal totalSaida = calcularTotalSaida(movimentacao);
 
-        this.saldoFinal = this.saldoInicial.add(totalEntrada).subtract(totalSaida);
+        this.saldoFinal = this.saldoInicial.add(totalEntrada).subtract(totalSaida).add(totalSaldoFinalCaixas);
     }
 
-    private BigDecimal calcularTotalEntrada(List<TesourariaMovimentacao> movimentos) {
+    private BigDecimal calcularTotalEntrada(List<TesourariaMovimento> movimentos) {
         return movimentos.stream()
                 .filter(t -> "ENTRADA".equals(t.getTipoMovimento()))
-                .map(TesourariaMovimentacao::getValor)
+                .map(TesourariaMovimento::getValor)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-    private BigDecimal calcularTotalSaida(List<TesourariaMovimentacao> movimentos) {
+    private BigDecimal calcularTotalSaida(List<TesourariaMovimento> movimentos) {
         return movimentos.stream()
                 .filter(t -> "SAIDA".equals(t.getTipoMovimento()))
-                .map(TesourariaMovimentacao::getValor)
+                .map(TesourariaMovimento::getValor)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
+    private BigDecimal calcularSaldoFinalCaixasFechados(){
+        if(caixas.stream()
+                .anyMatch(c -> c.getDataFechamento() == null)){
+            throw new ConflictTesourariaException("Não é possivel fechar tesouraria. Feche todos os caixas antes");
+        }else{
+            return caixas.stream().map(Caixa::getSaldoFinal).reduce(BigDecimal.ZERO, BigDecimal::add);
+        }
+    }
 }
