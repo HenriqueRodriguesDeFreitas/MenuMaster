@@ -2,6 +2,7 @@ package com.api.menumaster.service;
 
 import com.api.menumaster.dtos.response.ResponseTesourariaDto;
 import com.api.menumaster.exception.custom.ConflictTesourariaException;
+import com.api.menumaster.mappper.TesourariaMapper;
 import com.api.menumaster.model.Tesouraria;
 import com.api.menumaster.repository.TesourariaRepository;
 import jakarta.transaction.Transactional;
@@ -18,9 +19,11 @@ import java.util.List;
 public class TesourariaService {
 
     private final TesourariaRepository tesourariaRepository;
+    private final TesourariaMapper tesourariaMapper;
 
-    public TesourariaService(TesourariaRepository tesourariaRepository) {
+    public TesourariaService(TesourariaRepository tesourariaRepository, TesourariaMapper tesourariaMapper) {
         this.tesourariaRepository = tesourariaRepository;
+        this.tesourariaMapper = tesourariaMapper;
     }
 
     @Transactional
@@ -133,10 +136,7 @@ public class TesourariaService {
     }
 
     private ResponseTesourariaDto toResponseDto(Tesouraria tesouraria) {
-        return new ResponseTesourariaDto(tesouraria.getId(), tesouraria.getDataAbertura(),
-                tesouraria.getDataFechamento(), tesouraria.getDataReabertura(),
-                tesouraria.getSaldoInicial(), tesouraria.getSaldoFinal(), tesouraria.getUsuarioAbertura(),
-                tesouraria.getUsuarioFechamento(), tesouraria.getUsuarioReabertura());
+        return tesourariaMapper.toResponse(tesouraria);
     }
 
     private List<ResponseTesourariaDto> toResponseDto(List<Tesouraria> tesourarias) {
