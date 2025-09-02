@@ -55,7 +55,9 @@ public class PedidoService {
         pedido.setEndereco(dto.endereco());
         pedido.setContato(dto.contato());
         pedido.setObservacao(dto.observacao());
+        pedido.setUsuarioCriou(authentication.getName());
         pedido.setStatusPedido(StatusPedido.AGUARDANDO);
+
         if (dto.mesa() == null || dto.mesa() < 0) {
             pedido.setMesa(0);
         }
@@ -67,6 +69,8 @@ public class PedidoService {
         pedido.ajustarQuantidadeParaUnidade();
         pedido.calcularTotalPedido();
 
+        pedido.setCaixa(caixa);
+        caixa.getPedidos().add(pedido);
         return converteEntidadeParaDto(pedidoRepository.save(pedido));
     }
 
