@@ -75,9 +75,14 @@ public class PedidoService {
     }
 
     @Transactional
-    public ResponsePedidoDto atualizarPedido(UUID idPedido, RequestAtualizarPedidoDto dto) {
+    public ResponsePedidoDto editarPedido(UUID idPedido, RequestAtualizarPedidoDto dto,
+                                          Authentication authentication) {
         Pedido pedido = pedidoRepository.findById(idPedido)
                 .orElseThrow(() -> new ConflictEntityException("Pedido não encontrado"));
+
+        Caixa caixaAtual = validarCaixaAberto(authentication.getName());
+
+        validarPedidoPertenceMesmoCaixa(pedido, caixaAtual);
 
         List<ItemPedido> itensOriginais = new ArrayList<>(pedido.getItensAssociados());
 
@@ -87,6 +92,7 @@ public class PedidoService {
         pedido.setContato(dto.contato());
         pedido.setObservacao(dto.observacao());
         pedido.setStatusPedido(dto.status());
+        pedido.setUsuarioEditou(authentication.getName());
         if (dto.mesa() == null || dto.mesa() < 0) {
             pedido.setMesa(0);
         }
