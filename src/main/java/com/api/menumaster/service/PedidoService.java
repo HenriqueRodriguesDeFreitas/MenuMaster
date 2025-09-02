@@ -102,7 +102,7 @@ public class PedidoService {
 
         processarItensDoPedido(dto, pedido, novosItens);
 
-        atualizarEstoqueComDiferenca(pedido, itensOriginais, novosItens);
+        atualizarEstoqueComDiferenca(itensOriginais, novosItens);
 
         pedido.getItensAssociados().clear();
         pedido.getItensAssociados().addAll(novosItens);
