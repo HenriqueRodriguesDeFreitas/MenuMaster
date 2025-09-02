@@ -177,12 +177,19 @@ public class PedidoService {
         return converteEntidadeParaDto(pedidos);
     }
 
-    public List<ResponsePedidoDto> buscarPedidoPorStatus(StatusPedido status){
+    public List<ResponsePedidoDto> buscarPedidoPorStatus(StatusPedido status) {
         List<Pedido> pedidos = pedidoRepository.findByStatusPedidoOrderByDataEmissao(status);
         return converteEntidadeParaDto(pedidos);
     }
 
-    private void atualizarEstoqueComDiferenca(Pedido pedido, List<ItemPedido> itensOriginais, List<ItemPedido> novosItens) {
+    private static void validarPedidoPertenceMesmoCaixa(Pedido pedido, Caixa caixaAtual) {
+        if (!pedido.getCaixa().getId().equals(caixaAtual.getId())) {
+            throw new ConflictTesourariaException("Edição não permitida: pedido pertence a outro caixa." +
+                    " Recomendado criar outro pedido e efetuar sangria se necessário");
+        }
+    }
+
+    private void atualizarEstoqueComDiferenca(List<ItemPedido> itensOriginais, List<ItemPedido> novosItens) {
         Map<Produto, BigDecimal> produtosOriginais = itensOriginais.stream()
                 .collect(Collectors.groupingBy(
                         ItemPedido::getProduto,
