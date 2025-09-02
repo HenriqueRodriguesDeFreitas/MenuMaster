@@ -50,7 +50,17 @@ public class Pedido {
     @Column(length = 250)
     private String observacao;
 
-    @OneToMany(mappedBy = "pedido", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @Column(name = "usuario_criou",length = 20, nullable = false)
+    private String usuarioCriou;
+
+    @Column(name = "usuario_editou", length = 20)
+    private String usuarioEditou;
+
+    @ManyToOne
+    @JoinColumn(name = "caixa_id", nullable = false)
+    private Caixa caixa;
+
+    @OneToMany(mappedBy = "pedido", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
     private List<ItemPedido> itensAssociados = new ArrayList<>();
 
 
@@ -152,6 +162,30 @@ public class Pedido {
         this.mesa = mesa;
     }
 
+    public String getUsuarioCriou() {
+        return usuarioCriou;
+    }
+
+    public void setUsuarioCriou(String usuarioCriou) {
+        this.usuarioCriou = usuarioCriou;
+    }
+
+    public String getUsuarioEditou() {
+        return usuarioEditou;
+    }
+
+    public void setUsuarioEditou(String usuarioEditou) {
+        this.usuarioEditou = usuarioEditou;
+    }
+
+    public Caixa getCaixa() {
+        return caixa;
+    }
+
+    public void setCaixa(Caixa caixa) {
+        this.caixa = caixa;
+    }
+
     public void ajustarQuantidadeParaUnidade() {
         itensAssociados.forEach(i -> {
             if (i.getQuantidadeProduto().compareTo(BigDecimal.ZERO) <= 0) {
@@ -177,6 +211,4 @@ public class Pedido {
             this.setStatusPedido(statusPedido);
         }
     }
-
-
 }
