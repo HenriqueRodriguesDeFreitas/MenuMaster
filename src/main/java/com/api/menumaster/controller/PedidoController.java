@@ -2,6 +2,7 @@ package com.api.menumaster.controller;
 
 import com.api.menumaster.dtos.request.RequestAtualizarPedidoDto;
 import com.api.menumaster.dtos.request.RequestCriarPedidoDto;
+import com.api.menumaster.dtos.response.ResponsePedidoDto;
 import com.api.menumaster.model.enums.StatusPedido;
 import com.api.menumaster.service.PedidoService;
 import jakarta.validation.Valid;
@@ -14,6 +15,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
+import static com.api.menumaster.controller.utils.AuxiliarRetornoAuthentication.getAuthentication;
+
 @RestController
 @RequestMapping("/pedido")
 public class PedidoController {
@@ -25,48 +28,60 @@ public class PedidoController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAuthority('PEDIDO_CREATE')")
-    public ResponseEntity<?> criarPedido(@RequestBody @Valid RequestCriarPedidoDto dto) {
-        return ResponseEntity.ok(pedidoService.criarPedido(dto));
+    @PreAuthorize("hasAnyAuthority('ADMIN','PEDIDO_CREATE')")
+    public ResponseEntity<ResponsePedidoDto> criarPedido(@RequestBody @Valid RequestCriarPedidoDto dto) {
+        return ResponseEntity.ok(pedidoService.criarPedido(dto, getAuthentication()));
     }
 
     @PutMapping("/{idPedido}")
-    @PreAuthorize("hasAuthority('PEDIDO_EDIT')")
-    public ResponseEntity<?> editarPedido(@PathVariable("idPedido") UUID idPedido,
-                                          @RequestBody @Valid RequestAtualizarPedidoDto dto) {
-        return ResponseEntity.ok(pedidoService.atualizarPedido(idPedido, dto));
+    @PreAuthorize("hasAnyAuthority('ADMIN','PEDIDO_EDIT')")
+    public ResponseEntity<ResponsePedidoDto> editarPedido(@PathVariable("idPedido") UUID idPedido,
+                                                          @RequestBody @Valid RequestAtualizarPedidoDto dto) {
+        return ResponseEntity.ok(pedidoService.editarPedido(idPedido, dto, getAuthentication()));
     }
 
     @GetMapping
     @PreAuthorize("hasAnyAuthority('ADMIN','PEDIDO_READ')")
-    public ResponseEntity<List<?>> buscarTodosPedidos() {
+    public ResponseEntity<List<ResponsePedidoDto>> buscarTodosPedidos() {
         return ResponseEntity.ok(pedidoService.buscarTodosPedidos());
     }
 
     @GetMapping("/byDataEmissao")
-    @PreAuthorize("hasAuthority('PEDIDO_READ')")
-    public ResponseEntity<List<?>> buscarPedidosPorData(@RequestParam(value = "dataInicial", required = true) LocalDate inicio,
-                                                        @RequestParam(value = "dataFim", required = false) LocalDate fim) {
-        return ResponseEntity.ok(pedidoService.buscarPedidosPorDataEmissao(inicio, fim));
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'PEDIDO_READ')")
+    public ResponseEntity<List<ResponsePedidoDto>> buscarPedidoPorData(@RequestParam LocalDate dataEmissao) {
+        return ResponseEntity.ok(pedidoService.buscarPedidoPorDataEmissao(dataEmissao));
     }
 
-    @GetMapping("/byTotalPedido")
-    @PreAuthorize("hasAuthority('PEDIDO_READ')")
-    public ResponseEntity<List<?>> buscarPedidosPorTotal(
+    @GetMapping("/byDataEmissaoBetween")
+    @PreAuthorize("hasAnyAuthority('ADMIN','PEDIDO_READ')")
+    public ResponseEntity<List<ResponsePedidoDto>> buscarPedidosPorDataBetween(@RequestParam(value = "dataInicial") LocalDate inicio,
+                                                                               @RequestParam(value = "dataFim") LocalDate fim) {
+        return ResponseEntity.ok(pedidoService.buscarPedidosPorDataEmissaoBetween(inicio, fim));
+    }
+
+    @GetMapping("byTotalPedido")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'PEDIDO_READ')")
+    public ResponseEntity<List<ResponsePedidoDto>> buscarPedidoPorTotal(@RequestParam BigDecimal valorPedido){
+        return ResponseEntity.ok(pedidoService.buscarPedidoPorTotal(valorPedido));
+    }
+
+    @GetMapping("/byTotalPedidoBetween")
+    @PreAuthorize("hasAnyAuthority('ADMIN',PEDIDO_READ')")
+    public ResponseEntity<List<ResponsePedidoDto>> buscarPedidosPorTotalBetween(
             @RequestParam(value = "valorInicio", required = true) BigDecimal inicio,
             @RequestParam(value = "valorFim", required = false) BigDecimal fim) {
-        return ResponseEntity.ok(pedidoService.buscarPedidoPorTotal(inicio, fim));
+        return ResponseEntity.ok(pedidoService.buscarPedidoPorTotalBetween(inicio, fim));
     }
 
     @GetMapping("/byNumeroMesa/{numero}")
-    @PreAuthorize("hasAuthority('PEDIDO_READ')")
-    public ResponseEntity<List<?>> buscarPedidosPorMesa(@PathVariable("numero") Integer numero) {
+    @PreAuthorize("hasAnyAuthority('ADMIN','PEDIDO_READ')")
+    public ResponseEntity<List<ResponsePedidoDto>> buscarPedidosPorMesa(@PathVariable("numero") Integer numero) {
         return ResponseEntity.ok(pedidoService.buscarPorMesa(numero));
     }
 
     @GetMapping("/byStatusPedido/{status}")
-    @PreAuthorize("hasAuthority('PEDIDO_READ')")
-    public ResponseEntity<List<?>> buscarPedidoPorStatus(@PathVariable("status") StatusPedido status) {
+    @PreAuthorize("hasAnyAuthority('ADMIN',PEDIDO_READ')")
+    public ResponseEntity<List<ResponsePedidoDto>> buscarPedidoPorStatus(@PathVariable("status") StatusPedido status) {
         return ResponseEntity.ok(pedidoService.buscarPedidoPorStatus(status));
     }
 }
