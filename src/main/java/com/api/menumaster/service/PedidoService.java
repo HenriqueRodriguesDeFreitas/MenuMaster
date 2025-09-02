@@ -133,8 +133,6 @@ public class PedidoService {
 
 
         LocalDateTime dataHoraPedidoInicio = LocalDateTime.of(dataInicio.getYear(), dataInicio.getMonth(),
-                dataInicio.getDayOfMonth(), tempoPadrao.getHour(),
-                tempoPadrao.getMinute(), tempoPadrao.getSecond());
                 dataInicio.getDayOfMonth(), TEMPO_PADRAO_INICIO_DIA.getHour(),
                 TEMPO_PADRAO_INICIO_DIA.getMinute(), TEMPO_PADRAO_INICIO_DIA.getSecond());
 
@@ -153,20 +151,28 @@ public class PedidoService {
         return converteEntidadeParaDto(pedidos);
     }
 
-    public List<ResponsePedidoDto> buscarPorMesa(Integer mesa){
+    public List<ResponsePedidoDto> buscarPorMesa(Integer mesa) {
         List<Pedido> pedidos = pedidoRepository.findByMesaOrderByDataEmissao(mesa);
         return converteEntidadeParaDto(pedidos);
     }
 
-    public List<ResponsePedidoDto> buscarPedidoPorTotal(BigDecimal inicio, BigDecimal fim) {
+    public List<ResponsePedidoDto> buscarPedidoPorTotal(BigDecimal valorTotalPedido) {
+        if (valorTotalPedido.compareTo(BigDecimal.ZERO) < 0)
+            throw new IllegalArgumentException("o valor precisa ser maior que zero.");
+
+        return converteEntidadeParaDto(pedidoRepository
+                .findByTotalPedidoOrderByDataEmissao(valorTotalPedido));
+    }
+
+    public List<ResponsePedidoDto> buscarPedidoPorTotalBetween(BigDecimal inicio, BigDecimal fim) {
         List<Pedido> pedidos;
         if (fim != null) {
             if (!(fim.compareTo(inicio) > 0)) {
                 throw new IllegalArgumentException("O valor de inicio precisa ser maior que o do fim");
             }
-            pedidos = pedidoRepository.findByTotalPedidoBetween(inicio, fim);
+            pedidos = pedidoRepository.findByTotalPedidoBetweenOrderByDataEmissao(inicio, fim);
         } else {
-            pedidos = pedidoRepository.findByTotalPedidoBetween(inicio, inicio);
+            pedidos = pedidoRepository.findByTotalPedidoBetweenOrderByDataEmissao(inicio, inicio);
         }
         return converteEntidadeParaDto(pedidos);
     }
