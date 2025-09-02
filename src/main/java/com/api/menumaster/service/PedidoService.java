@@ -119,17 +119,24 @@ public class PedidoService {
         return converteEntidadeParaDto(pedidos);
     }
 
-    public List<ResponsePedidoDto> buscarPedidosPorDataEmissao(LocalDate dataInicio,
-                                                               LocalDate dataFim) {
-        LocalTime tempoPadrao = LocalTime.of(0, 0, 0);
+    public List<ResponsePedidoDto> buscarPedidoPorDataEmissao(LocalDate dataEmissao) {
+        LocalDateTime dataHoraEmissao = LocalDateTime.of(dataEmissao.getYear(), dataEmissao.getMonth(),
+                dataEmissao.getDayOfMonth(), TEMPO_PADRAO_INICIO_DIA.getHour(),
+                TEMPO_PADRAO_INICIO_DIA.getMinute(), TEMPO_PADRAO_INICIO_DIA.getSecond());
 
+        return converteEntidadeParaDto(pedidoRepository.findByDataEmissao(dataHoraEmissao));
+    }
 
-        List<Pedido> pedidos = new ArrayList<>();
+    public List<ResponsePedidoDto> buscarPedidosPorDataEmissaoBetween(LocalDate dataInicio,
+                                                                      LocalDate dataFim) {
+        List<Pedido> pedidos;
 
 
         LocalDateTime dataHoraPedidoInicio = LocalDateTime.of(dataInicio.getYear(), dataInicio.getMonth(),
                 dataInicio.getDayOfMonth(), tempoPadrao.getHour(),
                 tempoPadrao.getMinute(), tempoPadrao.getSecond());
+                dataInicio.getDayOfMonth(), TEMPO_PADRAO_INICIO_DIA.getHour(),
+                TEMPO_PADRAO_INICIO_DIA.getMinute(), TEMPO_PADRAO_INICIO_DIA.getSecond());
 
         if (dataFim != null) {
             LocalDateTime dataHoraPedidoFim = LocalDateTime.of(dataFim.getYear(), dataFim.getMonth(),
