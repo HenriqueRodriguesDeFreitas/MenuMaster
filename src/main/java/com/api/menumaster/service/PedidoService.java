@@ -5,18 +5,17 @@ import com.api.menumaster.dtos.request.RequestCriarPedidoDto;
 import com.api.menumaster.dtos.response.ResponseItemPedidoDto;
 import com.api.menumaster.dtos.response.ResponsePedidoDto;
 import com.api.menumaster.exception.custom.ConflictEntityException;
+import com.api.menumaster.exception.custom.ConflictTesourariaException;
 import com.api.menumaster.exception.custom.EntityNotFoundException;
 import com.api.menumaster.exception.custom.EstoqueInsuficienteException;
-import com.api.menumaster.model.Ingrediente;
-import com.api.menumaster.model.ItemPedido;
-import com.api.menumaster.model.Pedido;
-import com.api.menumaster.model.Produto;
+import com.api.menumaster.model.*;
 import com.api.menumaster.model.enums.StatusPedido;
+import com.api.menumaster.repository.CaixaRepository;
 import com.api.menumaster.repository.IngredienteRepository;
-import com.api.menumaster.repository.ItemPedidoRepository;
 import com.api.menumaster.repository.PedidoRepository;
 import com.api.menumaster.repository.ProdutoRepository;
 import jakarta.transaction.Transactional;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -30,21 +29,25 @@ import java.util.stream.Collectors;
 public class PedidoService {
 
     private final PedidoRepository pedidoRepository;
-    private final ItemPedidoRepository itemPedidoRepository;
     private final ProdutoRepository produtoRepository;
     private final IngredienteRepository ingredienteRepository;
+    private final CaixaRepository caixaRepository;
+    private static final LocalTime TEMPO_PADRAO_INICIO_DIA = LocalTime.of(0, 0, 0);
 
-    public PedidoService(PedidoRepository pedidoRepository, ItemPedidoRepository itemPedidoRepository,
+    public PedidoService(PedidoRepository pedidoRepository,
                          ProdutoRepository produtoRepository,
-                         IngredienteRepository ingredienteRepository) {
+                         IngredienteRepository ingredienteRepository,
+                         CaixaRepository caixaRepository) {
         this.pedidoRepository = pedidoRepository;
-        this.itemPedidoRepository = itemPedidoRepository;
         this.produtoRepository = produtoRepository;
         this.ingredienteRepository = ingredienteRepository;
+        this.caixaRepository = caixaRepository;
     }
 
     @Transactional
-    public ResponsePedidoDto criarPedido(RequestCriarPedidoDto dto) {
+    public ResponsePedidoDto criarPedido(RequestCriarPedidoDto dto, Authentication authentication) {
+        Caixa caixa = validarCaixaAberto(authentication.getName());
+
         Pedido pedido = new Pedido();
         pedido.setDataEmissao(LocalDateTime.now());
         pedido.setDataEdicao(LocalDateTime.now());
