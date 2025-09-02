@@ -2,6 +2,7 @@ package com.api.menumaster.service;
 
 import com.api.menumaster.dtos.response.ResponseTesourariaDto;
 import com.api.menumaster.exception.custom.ConflictTesourariaException;
+import com.api.menumaster.mappper.TesourariaMapper;
 import com.api.menumaster.model.Tesouraria;
 import com.api.menumaster.repository.TesourariaRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,6 +33,8 @@ class TesourariaServiceTest {
 
     @Mock
     private Authentication authentication;
+    @Mock
+    private TesourariaMapper tesourariaMapper;
 
     @InjectMocks
     private TesourariaService tesourariaService;
@@ -39,50 +42,85 @@ class TesourariaServiceTest {
     private Tesouraria tesourariaSalva;
     private Tesouraria tesourariaFechada;
 
-    private ResponseTesourariaDto responseTesourariaDto;
+    private ResponseTesourariaDto responseTesourariaSalvaDto;
+    private ResponseTesourariaDto responseTesourariaFechadaDto;
     private LocalDateTime hoje;
     private final String mensagemValidacaoDadosRetornadorTesouraria = "Validando dados de retornados de tesouraria.";
 
     @BeforeEach
     void setUp() {
+        hoje = LocalDateTime.now();
+
         tesourariaSalva = new Tesouraria(BigDecimal.ZERO, "usuarioTest");
         tesourariaSalva.setId(UUID.randomUUID());
-        tesourariaSalva.setDataAbertura(LocalDateTime.now());
-
-        hoje = LocalDateTime.now();
+        tesourariaSalva.setDataAbertura(hoje);
+        tesourariaSalva.setDataFechamento(hoje);
+        tesourariaSalva.setUsuarioFechamento("usuarioTest");
 
         tesourariaFechada = new Tesouraria(BigDecimal.ZERO, "usuarioTest");
         tesourariaFechada.setId(UUID.randomUUID());
         tesourariaFechada.setDataAbertura(hoje);
         tesourariaFechada.setDataFechamento(hoje);
         tesourariaFechada.setUsuarioFechamento("usuarioFechamentoTest");
-        tesourariaFechada.setUsuarioReabertura(authentication.getName());
+        tesourariaFechada.setUsuarioReabertura("usuarioFechamentoTest");
+
+        responseTesourariaSalvaDto = new ResponseTesourariaDto(
+                tesourariaSalva.getId(),
+                tesourariaSalva.getDataAbertura(),
+                tesourariaSalva.getDataFechamento(),
+                tesourariaSalva.getDataReabertura(),
+                tesourariaSalva.getSaldoInicial(),
+                tesourariaSalva.getSaldoFinal(),
+                tesourariaSalva.getUsuarioAbertura(),
+                tesourariaSalva.getUsuarioFechamento(),
+                tesourariaSalva.getUsuarioReabertura());
+
+        responseTesourariaFechadaDto = new ResponseTesourariaDto(
+                tesourariaFechada.getId(),
+                tesourariaFechada.getDataAbertura(),
+                tesourariaFechada.getDataFechamento(),
+                tesourariaFechada.getDataReabertura(),
+                tesourariaFechada.getSaldoInicial(),
+                tesourariaFechada.getSaldoFinal(),
+                tesourariaFechada.getUsuarioAbertura(),
+                tesourariaFechada.getUsuarioFechamento(),
+                tesourariaFechada.getUsuarioReabertura());
+
     }
 
     @Test
     void abrirTesouraria_deveRetornarResponseTesourariaDto_quandoSucesso() {
-        UUID idTesourariaSalva = tesourariaSalva.getId();
         when(tesourariaRepository.existsByDataFechamentoIsNull()).thenReturn(false);
         when(tesourariaRepository.findFirstByDataFechamentoIsNotNullOrderByDataFechamentoDesc())
                 .thenReturn(Optional.empty());
+
         when(tesourariaRepository.findByDataFechamentoBetween(
                 hoje.toLocalDate().atStartOfDay(),
                 hoje.toLocalDate().atTime(23, 59, 59)
         )).thenReturn(List.of());
+        when(tesourariaRepository.findByDataFechamento(any(LocalDateTime.class)))
+                .thenReturn(Optional.empty());
 
         when(authentication.getName()).thenReturn("usuarioTest");
 
         when(tesourariaRepository.save(any(Tesouraria.class))).thenReturn(tesourariaSalva);
+        when(tesourariaMapper.toResponse(any(Tesouraria.class))).thenReturn(responseTesourariaSalvaDto);
 
-        responseTesourariaDto = tesourariaService.abrirTesouraria(authentication);
+        responseTesourariaSalvaDto = tesourariaService.abrirTesouraria(authentication);
 
         assertAll(mensagemValidacaoDadosRetornadorTesouraria,
-                () -> validarTodosDadosTesouraria(tesourariaSalva, responseTesourariaDto));
+                () -> validarTodosDadosTesouraria(tesourariaSalva, responseTesourariaSalvaDto));
 
         verify(tesourariaRepository, times(1)).existsByDataFechamentoIsNull();
         verify(tesourariaRepository, times(1)).findByDataFechamentoBetween(hoje.toLocalDate().atStartOfDay(),
                 hoje.toLocalDate().atTime(23, 59, 59));
+        verify(tesourariaRepository, times(1))
+                .findByDataFechamento(any(LocalDateTime.class));
+
+        verify(tesourariaMapper, times(1)).toResponse(any(Tesouraria.class));
         verify(tesourariaRepository, times(1)).save(any(Tesouraria.class));
+        verifyNoMoreInteractions(tesourariaRepository);
+        verifyNoMoreInteractions(tesourariaMapper);
     }
 
     @Test
@@ -121,11 +159,15 @@ class TesourariaServiceTest {
     void fecharTesouraria_deveRetornarResponseTesourariaDto_quandoSucesso() {
         when(tesourariaRepository.findByDataFechamentoIsNull()).thenReturn(Optional.of(tesourariaSalva));
         when(tesourariaRepository.save(any(Tesouraria.class))).thenReturn(tesourariaSalva);
+        when(tesourariaMapper.toResponse(any(Tesouraria.class))).thenReturn(responseTesourariaSalvaDto);
+        when(authentication.getName()).thenReturn("usuarioTest");
 
-        responseTesourariaDto = tesourariaService.fecharTesouraria(authentication);
+        responseTesourariaSalvaDto = tesourariaService.fecharTesouraria(authentication);
+
+        tesourariaSalva.setDataFechamento(responseTesourariaSalvaDto.dataFechamento());
 
         assertAll(mensagemValidacaoDadosRetornadorTesouraria,
-                () -> validarTodosDadosTesouraria(tesourariaSalva, responseTesourariaDto));
+                () -> validarTodosDadosTesouraria(tesourariaSalva, responseTesourariaSalvaDto));
 
         verify(tesourariaRepository, times(1)).findByDataFechamentoIsNull();
         verify(tesourariaRepository, times(1)).save(tesourariaSalva);
@@ -154,11 +196,15 @@ class TesourariaServiceTest {
                 .thenReturn(Optional.of(tesourariaFechada));
         when(tesourariaRepository.save(any(Tesouraria.class))).thenReturn(tesourariaFechada);
         when(authentication.getName()).thenReturn("usuarioFechamentoTest");
+        when(tesourariaMapper.toResponse(any(Tesouraria.class))).thenReturn(responseTesourariaFechadaDto);
 
-        responseTesourariaDto = tesourariaService.reabrirTesouraria(authentication);
+        responseTesourariaFechadaDto = tesourariaService.reabrirTesouraria(authentication);
+        tesourariaFechada.setDataAbertura(responseTesourariaFechadaDto.dataAbertura());
+        tesourariaFechada.setDataFechamento(responseTesourariaFechadaDto.dataFechamento());
+        tesourariaFechada.setDataReabertura(responseTesourariaFechadaDto.dataReabertura());
 
         assertAll(mensagemValidacaoDadosRetornadorTesouraria,
-                () -> validarTodosDadosTesouraria(tesourariaFechada, responseTesourariaDto));
+                () -> validarTodosDadosTesouraria(tesourariaFechada, responseTesourariaFechadaDto));
 
         verify(tesourariaRepository, times(1)).findFirstByDataFechamentoIsNotNullOrderByDataFechamentoDesc();
         verify(tesourariaRepository, times(1)).save(tesourariaFechada);
@@ -209,6 +255,7 @@ class TesourariaServiceTest {
 
         when(tesourariaRepository.findByDataAberturaBetweenOrderByDataAbertura(
                 dataHoraTesourariaInicio, dataHoraTesourariaFim)).thenReturn(tesourariasSalvas);
+       mockMapperParaLista(tesourariasSalvas);
 
         List<ResponseTesourariaDto> responses =
                 tesourariaService.buscarTesourariasPorDataAbertura(dataInicial, dataFinal);
@@ -233,6 +280,7 @@ class TesourariaServiceTest {
         when(tesourariaRepository
                 .findByDataAberturaBetweenOrderByDataAbertura(dataHoraTesourariaBuscar, dataHoraTesourariaBuscar))
                 .thenReturn(tesourariasSalvas);
+        mockMapperParaLista(tesourariasSalvas);
 
         List<ResponseTesourariaDto> responses =
                 tesourariaService.buscarTesourariasPorDataAbertura(dataInicial, null);
@@ -270,7 +318,7 @@ class TesourariaServiceTest {
 
     private void validarTodosDadosTesouraria(Tesouraria tesouraria, ResponseTesourariaDto responseTesourariaDto) {
         assertNotNull(responseTesourariaDto, "retorno não deveria ser nulo.");
-        assertEquals(tesouraria.getId(), responseTesourariaDto.id());
+        assertEquals(tesouraria.getId(), responseTesourariaDto.id(), "id não coincide");
         assertEquals(tesouraria.getDataAbertura(), responseTesourariaDto.dataAbertura(), "Datas abertura não coincidem.");
         assertEquals(tesouraria.getDataFechamento(), responseTesourariaDto.dataFechamento(), "Datas fechamento não coincidem.");
         assertEquals(tesouraria.getDataReabertura(), responseTesourariaDto.dataReabertura(), "Datas reabertura não coincidem.");
@@ -303,4 +351,23 @@ class TesourariaServiceTest {
         assertEquals(tesourariasSalvas.get(1).getUsuarioReabertura(), responses.get(1).usuarioReabertura(), "Usuarios reabertura não coincidem");
         assertEquals(tesourariasSalvas.get(1).getUsuarioFechamento(), responses.get(1).usuarioFechamento(), "Usuarios fechamento não coincidem");
     }
+
+    private void mockMapperParaLista(List<Tesouraria> tesourarias) {
+        tesourarias.forEach(t -> {
+            when(tesourariaMapper.toResponse(t)).thenReturn(
+                    new ResponseTesourariaDto(
+                            t.getId(),
+                            t.getDataAbertura(),
+                            t.getDataFechamento(),
+                            t.getDataReabertura(),
+                            t.getSaldoInicial(),
+                            t.getSaldoFinal(),
+                            t.getUsuarioAbertura(),
+                            t.getUsuarioFechamento(),
+                            t.getUsuarioReabertura()
+                    )
+            );
+        });
+    }
+
 }
