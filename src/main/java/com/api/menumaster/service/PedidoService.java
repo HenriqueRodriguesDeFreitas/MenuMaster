@@ -261,4 +261,12 @@ public class PedidoService {
         });
     }
 
+    private Caixa validarCaixaAberto(String usuario) {
+        Optional<Caixa> caixa = caixaRepository.findByUsuarioUtilizandoAndDataFechamentoIsNull(usuario);
+        if (caixa.isEmpty()) {
+            throw new ConflictTesourariaException("Usuario não possui um caixa aberto.");
+        } else {
+            return caixa.get();
+        }
+    }
 }
