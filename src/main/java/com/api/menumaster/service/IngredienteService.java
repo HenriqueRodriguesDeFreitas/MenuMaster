@@ -61,13 +61,19 @@ public class IngredienteService {
         var ingredienteUpdate = ingredienteRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Ingrediente não cadastrado"));
 
-        // Validação do código - só conflita se for diferente do código atual
         ingredienteRepository.findByCodigo(dto.codigo())
                 .ifPresent(ingredienteExistente -> {
                     if (!ingredienteExistente.getId().equals(ingredienteUpdate.getId())) {
                         throw new ConflictEntityException("Já existe ingrediente com o código: " + dto.codigo());
                     }
                 });
+        ingredienteRepository.findByNomeIgnoreCase(dto.nome())
+                .ifPresent(ingredienteExistente -> {
+                    if (!ingredienteExistente.getNome().equals(ingredienteUpdate.getNome())) {
+                        throw new ConflictEntityException("Já existe ingrediente com este nome: " + dto.nome());
+                    }
+                });
+
         ingredienteUpdate.setNome(dto.nome());
         ingredienteUpdate.setDescricao(dto.descricao());
         ingredienteUpdate.setPrecoCusto(dto.precoCusto());
@@ -77,8 +83,8 @@ public class IngredienteService {
         ingredienteUpdate.setUnidadeMedida(dto.unidadeMedida());
         ingredienteUpdate.setControlarEstoque(dto.controlarEstoque());
 
-  var response = ingredienteRepository.save(ingredienteUpdate);
-  return converteEntityToDto(response);
+        var response = ingredienteRepository.save(ingredienteUpdate);
+        return converteEntityToDto(response);
     }
 
     public List<ResponseIngredienteDto> findAll() {
@@ -93,9 +99,9 @@ public class IngredienteService {
 
     public ResponseIngredienteDto findByCodigo(Integer codigo) {
         Optional<Ingrediente> response = ingredienteRepository.findByCodigo(codigo);
-        if(response.isPresent()){
+        if (response.isPresent()) {
             return converteEntityToDto(response.get());
-        }else{
+        } else {
             throw new EntityNotFoundException("Ingrediente não existe");
         }
     }
