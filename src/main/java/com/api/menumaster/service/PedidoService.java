@@ -132,24 +132,21 @@ public class PedidoService {
 
     public List<ResponsePedidoDto> buscarPedidosPorDataEmissaoBetween(LocalDate dataInicio,
                                                                       LocalDate dataFim) {
-        List<Pedido> pedidos;
+        if (dataInicio == null || dataFim == null)
+            throw new IllegalArgumentException("Data de inicio ou fim não pode ser nula.");
 
+        if (dataInicio.isAfter(dataFim))
+            throw new IllegalArgumentException("A data de inicio precisa ser anterior a data final.");
 
         LocalDateTime dataHoraPedidoInicio = LocalDateTime.of(dataInicio.getYear(), dataInicio.getMonth(),
                 dataInicio.getDayOfMonth(), TEMPO_PADRAO_INICIO_DIA.getHour(),
                 TEMPO_PADRAO_INICIO_DIA.getMinute(), TEMPO_PADRAO_INICIO_DIA.getSecond());
 
-        if (dataFim != null) {
-            LocalDateTime dataHoraPedidoFim = LocalDateTime.of(dataFim.getYear(), dataFim.getMonth(),
-                    dataFim.getDayOfMonth(), 23, 59, 59);
 
-            pedidos = pedidoRepository.findByDataEmissaoBetween(dataHoraPedidoInicio, dataHoraPedidoFim);
-        } else {
+        LocalDateTime dataHoraPedidoFim = LocalDateTime.of(dataFim.getYear(), dataFim.getMonth(),
+                dataFim.getDayOfMonth(), 23, 59, 59);
 
-            LocalDateTime dataHoraPedidoFim = LocalDateTime.of(dataInicio.getYear(), dataInicio.getMonth(),
-                    dataInicio.getDayOfMonth(), 23, 59, 59);
-            pedidos = pedidoRepository.findByDataEmissaoBetween(dataHoraPedidoInicio, dataHoraPedidoFim);
-        }
+        List<Pedido> pedidos = pedidoRepository.findByDataEmissaoBetween(dataHoraPedidoInicio, dataHoraPedidoFim);
 
         return converteEntidadeParaDto(pedidos);
     }
