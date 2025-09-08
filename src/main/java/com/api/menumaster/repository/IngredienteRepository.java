@@ -21,6 +21,10 @@ public interface IngredienteRepository extends JpaRepository<Ingrediente, UUID> 
     List<Ingrediente> findByPrecoCusto(BigDecimal precoCusto);
     List<Ingrediente> findByPrecoVenda(BigDecimal precoVenda);
 
+    List<Ingrediente> findByPrecoCustoBetween(BigDecimal precoCustoInicial, BigDecimal precoCustoFinal);
+    List<Ingrediente> findByPrecoVendaBetween(BigDecimal precoVendaInicial, BigDecimal precoVendaFinal);
+
+
     List<Ingrediente> findByIsAtivoTrue();
     List<Ingrediente> findByIsAtivoFalse();
 
