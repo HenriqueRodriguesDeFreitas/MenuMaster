@@ -4,7 +4,9 @@ import com.api.menumaster.dtos.request.RequestIngredienteDto;
 import com.api.menumaster.dtos.request.RequestIngredienteUpdateDto;
 import com.api.menumaster.dtos.response.ResponseIngredienteDto;
 import com.api.menumaster.exception.custom.ConflictEntityException;
+import com.api.menumaster.exception.custom.DadoPassadoNuloException;
 import com.api.menumaster.exception.custom.EntityNotFoundException;
+import com.api.menumaster.mappper.IngredienteMapper;
 import com.api.menumaster.model.Ingrediente;
 import com.api.menumaster.model.enums.UnidadeMedida;
 import com.api.menumaster.repository.IngredienteRepository;
@@ -20,9 +22,12 @@ import java.util.UUID;
 public class IngredienteService {
 
     private final IngredienteRepository ingredienteRepository;
+    private final IngredienteMapper ingredienteMapper;
 
-    public IngredienteService(IngredienteRepository ingredienteRepository) {
+    public IngredienteService(IngredienteRepository ingredienteRepository,
+                              IngredienteMapper ingredienteMapper) {
         this.ingredienteRepository = ingredienteRepository;
+        this.ingredienteMapper = ingredienteMapper;
     }
 
     @Transactional
@@ -155,20 +160,14 @@ public class IngredienteService {
         return converteEntityToDto(ingredientes);
     }
 
-    public void deleteById(UUID id){
+    public void deleteById(UUID id) {
         var ingrediente = ingredienteRepository.findById(id)
-                .orElseThrow(()-> new EntityNotFoundException("Ingrediente não existe"));
+                .orElseThrow(() -> new EntityNotFoundException("Ingrediente não existe"));
         ingredienteRepository.deleteById(ingrediente.getId());
     }
 
     private ResponseIngredienteDto converteEntityToDto(Ingrediente ingrediente) {
-        return new ResponseIngredienteDto(
-                ingrediente.getId(), ingrediente.getCodigo(), ingrediente.getNome(),
-                ingrediente.getDescricao(), ingrediente.getEstoque(),
-                ingrediente.getPrecoCusto(), ingrediente.getPrecoVenda(),
-                ingrediente.isAtivo(), ingrediente.isAdicional(),
-                ingrediente.getUnidadeMedida(), ingrediente.isControlarEstoque()
-        );
+        return ingredienteMapper.toResponse(ingrediente);
     }
 
     private List<ResponseIngredienteDto> converteEntityToDto(List<Ingrediente> ingredientes) {
