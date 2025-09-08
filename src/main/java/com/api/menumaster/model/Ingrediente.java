@@ -18,10 +18,10 @@ public class Ingrediente {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(name = "codigo", nullable = false)
+    @Column(name = "codigo", nullable = false, unique = true)
     private Integer codigo;
 
-    @Column(length = 30, nullable = false)
+    @Column(length = 30, nullable = false, unique = true)
     private String nome;
 
     @Column(length = 250)
@@ -75,6 +75,10 @@ public class Ingrediente {
 
     public UUID getId() {
         return id;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
     }
 
     public Integer getCodigo() {
