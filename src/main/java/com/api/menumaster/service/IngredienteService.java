@@ -205,9 +205,11 @@ public class IngredienteService {
 
     private List<ResponseIngredienteDto> converteEntityToDto(List<Ingrediente> ingredientes) {
         return ingredientes.stream()
-                .map(i ->
-                        new ResponseIngredienteDto(i.getId(), i.getCodigo(), i.getNome(),
-                                i.getDescricao(), i.getEstoque(), i.getPrecoCusto(), i.getPrecoVenda(),
-                                i.isAtivo(), i.isAdicional(), i.getUnidadeMedida(), i.isControlarEstoque())).toList();
+                .map(this::converteEntityToDto).toList();
+    }
+
+    private static void validandoSeValoresSaoDiferentesDeNulo(BigDecimal valorInicial, BigDecimal valorFinal) {
+        if (valorInicial == null || valorFinal == null)
+            throw new DadoPassadoNuloException("Valor inicial ou final não pode ser nulo.");
     }
 }
