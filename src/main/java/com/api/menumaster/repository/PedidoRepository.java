@@ -11,7 +11,9 @@ import java.util.UUID;
 
 public interface PedidoRepository extends JpaRepository<Pedido, UUID> {
     List<Pedido> findByDataEmissaoBetween(LocalDateTime inicio, LocalDateTime fim);
-    List<Pedido> findByTotalPedidoBetween(BigDecimal inicio, BigDecimal fim);
+    List<Pedido> findByDataEmissao(LocalDateTime dataEmissao);
+    List<Pedido> findByTotalPedidoBetweenOrderByDataEmissao(BigDecimal inicio, BigDecimal fim);
+    List<Pedido> findByTotalPedidoOrderByDataEmissao(BigDecimal valorPedido);
     List<Pedido> findByMesaOrderByDataEmissao(Integer mesa);
     List<Pedido> findByStatusPedidoOrderByDataEmissao(StatusPedido statusPedido);
 }
