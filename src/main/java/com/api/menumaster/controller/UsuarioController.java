@@ -4,7 +4,6 @@ import com.api.menumaster.dtos.request.RequestUserUpdateDto;
 import com.api.menumaster.dtos.request.RequestUsuarioDto;
 import com.api.menumaster.dtos.response.ResponseUsuarioDto;
 import com.api.menumaster.service.UsuarioService;
-import jakarta.annotation.security.PermitAll;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +26,7 @@ public class UsuarioController {
     @PostMapping
     @PreAuthorize("hasAnyAuthority('ADMIN','USUARIO_CREATE')")
     public ResponseEntity<?> salvar(@RequestBody @Valid RequestUsuarioDto dto) {
-        return ResponseEntity.ok(usuarioService.salvar(dto));
+        return ResponseEntity.ok(usuarioService.salvarNovoUsuario(dto));
     }
 
     @PutMapping("/{idUsuario}")
@@ -35,26 +34,26 @@ public class UsuarioController {
     public ResponseEntity<ResponseUsuarioDto> updateUser(@PathVariable(value = "idUsuario",
                                                                  required = true) UUID idUsuario,
                                                          @RequestBody @Valid RequestUserUpdateDto dto) {
-        return ResponseEntity.ok(usuarioService.updateUser(idUsuario, dto));
+        return ResponseEntity.ok(usuarioService.updateUsuario(idUsuario, dto));
     }
 
     @DeleteMapping("/{idUsuario}")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'USUARIO_DELETE')")
     public ResponseEntity<Void> deleteUser(@PathVariable(value = "idUsuario", required = true)
                                            UUID idUsuario) {
-        usuarioService.deleteUser(idUsuario);
+        usuarioService.deleteUsuario(idUsuario);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @GetMapping
     @PreAuthorize("hasAnyAuthority('ADMIN', 'USUARIO_READ')")
     public ResponseEntity<List<ResponseUsuarioDto>> findAllUsers(){
-        return ResponseEntity.ok(usuarioService.findAllUsers());
+        return ResponseEntity.ok(usuarioService.findAllUsuarios());
     }
 
     @GetMapping("/byName/{name}")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'USUARIO_READ')")
     public ResponseEntity<List<ResponseUsuarioDto>> findUsersByName(@PathVariable("name") String name){
-        return ResponseEntity.ok(usuarioService.findUsersByName(name));
+        return ResponseEntity.ok(usuarioService.findByUsuarioPorNome(name));
     }
 }

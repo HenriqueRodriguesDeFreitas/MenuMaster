@@ -23,7 +23,7 @@ public class FornecedorService {
     }
 
     @Transactional
-    public ResponseFornecedorDto save(RequestFornecedorDto dto) {
+    public ResponseFornecedorDto salvarNovoFornecedor(RequestFornecedorDto dto) {
         verificarExistente(dto);
 
         Fornecedor fornecedor = new Fornecedor();
@@ -41,42 +41,46 @@ public class FornecedorService {
 
     }
 
-    public ResponseFornecedorDto findByCnpj(String cnpj) {
+    public ResponseFornecedorDto buscarFornecedorPorCnpj(String cnpj) {
         var response = fornecedorRepository.findByCnpj(cnpj)
                 .orElseThrow(() -> new EntityNotFoundException("cnpj não cadastrado"));
 
         return convertEntityToDto(response);
     }
 
-    public ResponseFornecedorDto findByIncricaoEstadual(String inscricaoEstadual) {
+    public ResponseFornecedorDto buscarFornecedorPorInscricaoEstadual(String inscricaoEstadual) {
         var response = fornecedorRepository.findByInscricaoEstadual(inscricaoEstadual)
                 .orElseThrow(() -> new EntityNotFoundException("inscrição estadual não cadastrado"));
 
         return convertEntityToDto(response);
     }
 
-    public List<ResponseFornecedorDto> findByNomeFantasia(String nomeFantasia) {
+    public List<ResponseFornecedorDto> buscarFornecedorPorNomeFantasia(String nomeFantasia) {
         List<Fornecedor> response = fornecedorRepository.
                 findByNomeFantasiaContainingIgnoreCase(nomeFantasia);
 
         return convertEntityToDto(response);
     }
-    public List<ResponseFornecedorDto> findByRazaoSocial(String razaoSocial) {
+
+    public List<ResponseFornecedorDto> buscarFornecedorPorRazaoSocial(String razaoSocial) {
         List<Fornecedor> response = fornecedorRepository.
                 findByRazaoSocialContainingIgnoreCase(razaoSocial);
 
         return convertEntityToDto(response);
     }
 
-    public List<ResponseFornecedorDto> findByFornecedoresAtivos(){
+    public List<ResponseFornecedorDto> buscarFornecedorPorFornecedoresAtivos() {
         List<Fornecedor> response = fornecedorRepository.findByIsAtivoTrue();
 
-        return  convertEntityToDto(response);
+        return convertEntityToDto(response);
     }
 
-    public ResponseFornecedorDto update(UUID id, RequestFornecedorUpdateDto dto){
+    @Transactional
+    public ResponseFornecedorDto atualizarFornecedor(UUID id, RequestFornecedorUpdateDto dto) {
         Fornecedor fornecedor = fornecedorRepository.findById(id)
-                .orElseThrow(()-> new EntityNotFoundException("fornecedor não encontrado"));
+                .orElseThrow(() -> new EntityNotFoundException("fornecedor não encontrado"));
+
+        verificarExistenteUpdate(id, dto);
 
         fornecedor.setRazaoSocial(dto.razaoSocial());
         fornecedor.setNomeFantasia(dto.nomeFantasia());
@@ -91,9 +95,9 @@ public class FornecedorService {
         return convertEntityToDto(response);
     }
 
-    public void deleteById(UUID id){
+    public void deleteById(UUID id) {
         var response = fornecedorRepository.findById(id)
-                .orElseThrow(()-> new EntityNotFoundException("id não encontrado."));
+                .orElseThrow(() -> new EntityNotFoundException("id não encontrado."));
         fornecedorRepository.deleteById(response.getId());
     }
 
@@ -114,12 +118,47 @@ public class FornecedorService {
 
     private void verificarExistente(RequestFornecedorDto dto) {
         fornecedorRepository.findByCnpj(dto.cnpj())
-                .ifPresent( s-> {throw new ConflictEntityException("cnpj já cadastrado");});
+                .ifPresent(s -> {
+                    throw new ConflictEntityException("cnpj já cadastrado");
+                });
         fornecedorRepository.findByInscricaoEstadual(dto.inscricaoEstadual())
-                .ifPresent(s -> {throw new ConflictEntityException("IE já cadastrado");});
+                .ifPresent(s -> {
+                    throw new ConflictEntityException("IE já cadastrado");
+                });
         fornecedorRepository.findByRazaoSocialIgnoreCase(dto.razaoSocial())
-                .ifPresent(s -> {throw new ConflictEntityException("razão social já cadastrado");});
+                .ifPresent(s -> {
+                    throw new ConflictEntityException("razão social já cadastrado");
+                });
         fornecedorRepository.findByNomeFantasiaIgnoreCase(dto.nomeFantasia())
-                .ifPresent(s -> {throw new ConflictEntityException("nome fantasia já cadastrado");});
+                .ifPresent(s -> {
+                    throw new ConflictEntityException("nome fantasia já cadastrado");
+                });
     }
+
+    private void verificarExistenteUpdate(UUID id, RequestFornecedorUpdateDto dto) {
+        fornecedorRepository.findByCnpj(dto.cnpj())
+                .filter(f -> !f.getId().equals(id))
+                .ifPresent(s -> {
+                    throw new ConflictEntityException("CNPJ já cadastrado");
+                });
+
+        fornecedorRepository.findByInscricaoEstadual(dto.inscricaoEstadual())
+                .filter(f -> !f.getId().equals(id))
+                .ifPresent(s -> {
+                    throw new ConflictEntityException("IE já cadastrado");
+                });
+
+        fornecedorRepository.findByRazaoSocialIgnoreCase(dto.razaoSocial())
+                .filter(f -> !f.getId().equals(id))
+                .ifPresent(s -> {
+                    throw new ConflictEntityException("Razão social já cadastrada");
+                });
+
+        fornecedorRepository.findByNomeFantasiaIgnoreCase(dto.nomeFantasia())
+                .filter(f -> !f.getId().equals(id))
+                .ifPresent(s -> {
+                    throw new ConflictEntityException("Nome fantasia já cadastrado");
+                });
+    }
+
 }

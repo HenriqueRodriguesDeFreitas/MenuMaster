@@ -34,7 +34,7 @@ public class UsuarioService {
     }
 
     @Transactional
-    public ResponseUsuarioDto salvar(RequestUsuarioDto dto) {
+    public ResponseUsuarioDto salvarNovoUsuario(RequestUsuarioDto dto) {
         usuarioRepository.findByNome(dto.nome())
                 .ifPresent(u -> {
                     throw new ConflictEntityException("Usuário já cadastrado");
@@ -52,7 +52,7 @@ public class UsuarioService {
     }
 
     @Transactional
-    public ResponseUsuarioDto updateUser(UUID idUsuario, RequestUserUpdateDto dto) {
+    public ResponseUsuarioDto updateUsuario(UUID idUsuario, RequestUserUpdateDto dto) {
         Usuario usuario = usuarioRepository.findById(idUsuario).orElseThrow(
                 () -> new EntityNotFoundException("Nenhum usuário com este id encontrado!"));
 
@@ -69,7 +69,7 @@ public class UsuarioService {
         return converterUsuarioParaResponseDto(usuarioRepository.save(usuario));
     }
 
-    public void deleteUser(UUID idUsuarioADeletar) {
+    public void deleteUsuario(UUID idUsuarioADeletar) {
         String responseErrorUserIdNotFound =
                 String.format("Usuário com Id: %s não encontrado.", idUsuarioADeletar.toString());
         Usuario usuario = usuarioRepository.findById(idUsuarioADeletar)
@@ -77,16 +77,16 @@ public class UsuarioService {
         usuarioRepository.delete(usuario);
     }
 
-    public List<ResponseUsuarioDto> findAllUsers() {
+    public List<ResponseUsuarioDto> findAllUsuarios() {
         List<Usuario> usuarios = usuarioRepository.findAll();
         return converterUsuarioParaRespondeDto(usuarios);
     }
 
-    public List<ResponseUsuarioDto> findUsersByName(String nome) {
+    public List<ResponseUsuarioDto> findByUsuarioPorNome(String nome) {
         return converterUsuarioParaRespondeDto(usuarioRepository.findByNomeContainingOrderByNome(nome));
     }
 
-    public ResponseUsuarioDto findById(UUID id){
+    public ResponseUsuarioDto findByUsuarioPorId(UUID id){
         Optional<Usuario> usuario = usuarioRepository.findById(id);
 
         if(usuario.isEmpty()){

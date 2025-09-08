@@ -19,7 +19,7 @@ public class JwtService {
         this.encoder = encoder;
     }
 
-    public String generateToken(Authentication authentication) {
+    public String gerarTokenAcesso(Authentication authentication) {
         Instant agora = Instant.now();
         long expiracao = 3600L;
 

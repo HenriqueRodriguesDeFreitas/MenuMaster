@@ -31,7 +31,7 @@ public class IngredienteService {
     }
 
     @Transactional
-    public ResponseIngredienteDto save(RequestIngredienteDto dto) {
+    public ResponseIngredienteDto salvarNovoIngrediente(RequestIngredienteDto dto) {
         ingredienteRepository.findByCodigo(dto.codigo())
                 .ifPresent(i -> {
                     throw new ConflictEntityException(" Já ingrediente com o codigo: " + i.getCodigo());
@@ -57,7 +57,7 @@ public class IngredienteService {
     }
 
     @Transactional
-    public ResponseIngredienteDto update(UUID id, RequestIngredienteUpdateDto dto) {
+    public ResponseIngredienteDto atualizarIngrediente(UUID id, RequestIngredienteUpdateDto dto) {
         var ingredienteUpdate = ingredienteRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Ingrediente não cadastrado"));
 
@@ -87,17 +87,17 @@ public class IngredienteService {
         return converteEntityToDto(response);
     }
 
-    public List<ResponseIngredienteDto> findAll() {
+    public List<ResponseIngredienteDto> buscarTodosIngredientes() {
         List<Ingrediente> ingredientes = ingredienteRepository.findAll();
         return converteEntityToDto(ingredientes);
     }
 
-    public List<ResponseIngredienteDto> findByNome(String nome) {
+    public List<ResponseIngredienteDto> buscarIngredientePorNome(String nome) {
         List<Ingrediente> ingredientes = ingredienteRepository.findByNomeContainingIgnoreCaseOrderByNome(nome);
         return converteEntityToDto(ingredientes);
     }
 
-    public ResponseIngredienteDto findByCodigo(Integer codigo) {
+    public ResponseIngredienteDto buscarIngredientePorCodigo(Integer codigo) {
         Optional<Ingrediente> response = ingredienteRepository.findByCodigo(codigo);
         if (response.isPresent()) {
             return converteEntityToDto(response.get());
@@ -106,26 +106,26 @@ public class IngredienteService {
         }
     }
 
-    public List<ResponseIngredienteDto> findByDescricao(String descricao) {
+    public List<ResponseIngredienteDto> buscarIngredientePorDescricao(String descricao) {
         List<Ingrediente> ingredientes =
                 ingredienteRepository.findByDescricaoContainingIgnoreCase(descricao);
         return converteEntityToDto(ingredientes);
     }
 
-    public List<ResponseIngredienteDto> findByPrecoCusto(BigDecimal precoCusto) {
+    public List<ResponseIngredienteDto> buscarIngredientePorPrecoCusto(BigDecimal precoCusto) {
         List<Ingrediente> ingredientes =
                 ingredienteRepository.findByPrecoCusto(precoCusto);
         return converteEntityToDto(ingredientes);
     }
 
-    public List<ResponseIngredienteDto> findByPrecoVenda(BigDecimal precoVenda) {
+    public List<ResponseIngredienteDto> buscarIngredientePorPrecoVenda(BigDecimal precoVenda) {
         List<Ingrediente> ingredientes =
                 ingredienteRepository.findByPrecoVenda(precoVenda);
         return converteEntityToDto(ingredientes);
     }
 
-    public List<ResponseIngredienteDto> findByPrecoCustoBetween(BigDecimal valorInicial,
-                                                                BigDecimal valorFinal) {
+    public List<ResponseIngredienteDto> buscarIngredientePorPrecoCustoBetween(BigDecimal valorInicial,
+                                                                              BigDecimal valorFinal) {
         validandoSeValoresSaoDiferentesDeNulo(valorInicial, valorFinal);
 
         if (valorFinal.compareTo(valorInicial) > 0) {
@@ -137,8 +137,8 @@ public class IngredienteService {
         }
     }
 
-    public List<ResponseIngredienteDto> findByPrecoVendaBetween(BigDecimal valorInicial,
-                                                                BigDecimal valorFinal) {
+    public List<ResponseIngredienteDto> buscarIngredientePorPrecoVendaBetween(BigDecimal valorInicial,
+                                                                              BigDecimal valorFinal) {
 
         validandoSeValoresSaoDiferentesDeNulo(valorInicial, valorFinal);
 
@@ -151,43 +151,43 @@ public class IngredienteService {
         }
     }
 
-    public List<ResponseIngredienteDto> findByIsAtivo() {
+    public List<ResponseIngredienteDto> buscarIngredienteIsAtivo() {
         List<Ingrediente> ingredientes =
                 ingredienteRepository.findByIsAtivoTrue();
         return converteEntityToDto(ingredientes);
     }
 
-    public List<ResponseIngredienteDto> findByIsInativo() {
+    public List<ResponseIngredienteDto> buscarIngredienteIsInativo() {
         List<Ingrediente> ingredientes =
                 ingredienteRepository.findByIsAtivoFalse();
         return converteEntityToDto(ingredientes);
     }
 
-    public List<ResponseIngredienteDto> findByIsAdicional() {
+    public List<ResponseIngredienteDto> buscarIngredienteIsAdicional() {
         List<Ingrediente> ingredientes =
                 ingredienteRepository.findByIsAdicionalTrue();
         return converteEntityToDto(ingredientes);
     }
 
-    public List<ResponseIngredienteDto> findByIsNotAdicional() {
+    public List<ResponseIngredienteDto> buscarIngredienteIsNotAdicional() {
         List<Ingrediente> ingredientes =
                 ingredienteRepository.findByIsAdicionalFalse();
         return converteEntityToDto(ingredientes);
     }
 
-    public List<ResponseIngredienteDto> findByUnidadeMedida(UnidadeMedida unidadeMedida) {
+    public List<ResponseIngredienteDto> buscarIngredienteUnidadeMedida(UnidadeMedida unidadeMedida) {
         List<Ingrediente> ingredientes =
                 ingredienteRepository.findByUnidadeMedida(unidadeMedida);
         return converteEntityToDto(ingredientes);
     }
 
-    public List<ResponseIngredienteDto> findByControlarEstoqueIsTrue() {
+    public List<ResponseIngredienteDto> buscarIngredienteControlarEstoqueIsTrue() {
         List<Ingrediente> ingredientes =
                 ingredienteRepository.findByControlarEstoqueTrue();
         return converteEntityToDto(ingredientes);
     }
 
-    public List<ResponseIngredienteDto> findByControlarEstoqueIsFalse() {
+    public List<ResponseIngredienteDto> buscarIngredienteControlarEstoqueIsFalse() {
         List<Ingrediente> ingredientes =
                 ingredienteRepository.findByControlarEstoqueFalse();
         return converteEntityToDto(ingredientes);

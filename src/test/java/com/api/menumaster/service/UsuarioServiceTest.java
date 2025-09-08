@@ -67,7 +67,7 @@ class UsuarioServiceTest {
     }
 
     @Test
-    void salvar_deveRetornarResponseUsuarioDto_quandoSucesso() {
+    void salvar_NovoUsuario_deveRetornarResponseUsuarioDto_quandoSucesso() {
         String senhaOriginal = "senha123";
         String senhaCriptografada = "hashDaSenha";
 
@@ -75,7 +75,7 @@ class UsuarioServiceTest {
         when(authorityRepository.findByNome(anyString())).thenReturn(Optional.of(authority));
         when(passwordEncoder.encode(senhaOriginal)).thenReturn(senhaCriptografada);
         when(usuarioRepository.save(any(Usuario.class))).thenReturn(usuarioSalvo);
-        responseUsuarioDto = usuarioService.salvar(requestUserDto);
+        responseUsuarioDto = usuarioService.salvarNovoUsuario(requestUserDto);
 
         assertNotNull(responseUsuarioDto);
         assertEquals(usuarioSalvo.getId(), responseUsuarioDto.id(), "O id diferente do esperado.");
@@ -89,20 +89,20 @@ class UsuarioServiceTest {
     }
 
     @Test
-    void salvar_deveLancarConflictEntityException__quandoUsuarioExiste() {
+    void salvar_NovoUsuario_deveLancarConflictEntityException__quandoUsuarioExiste() {
         when(usuarioRepository.findByNome(requestUserDto.nome())).thenReturn(Optional.of(usuarioSalvo));
 
-        assertThrows(ConflictEntityException.class, () -> usuarioService.salvar(requestUserDto));
+        assertThrows(ConflictEntityException.class, () -> usuarioService.salvarNovoUsuario(requestUserDto));
 
         verify(usuarioRepository, times(1)).findByNome(requestUserDto.nome());
         verifyNoMoreInteractions(authorityRepository, passwordEncoder, usuarioRepository);
     }
 
     @Test
-    void salvar_deveLacarEntityNotFoundException_quandoAuthorityNaoExiste() {
+    void salvar_NovoUsuario_deveLacarEntityNotFoundException_quandoAuthorityNaoExiste() {
         when(authorityRepository.findByNome(requestUserDto.authority())).thenReturn(Optional.empty());
 
-        assertThrows(EntityNotFoundException.class, () -> usuarioService.salvar(requestUserDto));
+        assertThrows(EntityNotFoundException.class, () -> usuarioService.salvarNovoUsuario(requestUserDto));
 
         verify(authorityRepository, times(1)).findByNome(requestUserDto.authority());
         verifyNoInteractions(passwordEncoder);
@@ -110,7 +110,7 @@ class UsuarioServiceTest {
     }
 
     @Test
-    void updateUser_devePermitir_quandoNovoNomeIgualAoAtual() {
+    void updateUsuario_devePermitir_quandoNovoNomeIgualAoAtual() {
         when(usuarioRepository.findById(usuarioSalvo.getId())).thenReturn(Optional.of(usuarioSalvo));
         when(usuarioRepository.findByNome(usuarioSalvo.getNome())).thenReturn(Optional.of(usuarioSalvo));
         when(authorityRepository.findByNome("ADMIN")).thenReturn(Optional.of(authority));
@@ -122,7 +122,7 @@ class UsuarioServiceTest {
                 Set.of("ADMIN")
         );
 
-        ResponseUsuarioDto response = usuarioService.updateUser(usuarioSalvo.getId(), requestUserUpdateDto);
+        ResponseUsuarioDto response = usuarioService.updateUsuario(usuarioSalvo.getId(), requestUserUpdateDto);
 
         assertNotNull(response, "Objeto está retornando nulo");
         assertEquals(usuarioSalvo.getId(), response.id(), "Id diferente do esperado.");
@@ -138,7 +138,7 @@ class UsuarioServiceTest {
     }
 
     @Test
-    void updateUser_deveRetornarResponseUsuarioDto_quandoSucesso() {
+    void updateUsuario_deveRetornarResponseUsuarioDto_quandoSucesso() {
         Authority novaAuthority = new Authority();
         novaAuthority.setNome("OPERADOR");
         usuarioSalvo.adicionarAuthority(novaAuthority);
@@ -150,7 +150,7 @@ class UsuarioServiceTest {
         when(authorityRepository.findByNome("ADMIN")).thenReturn(Optional.of(authority));
         when(authorityRepository.findByNome("OPERADOR")).thenReturn(Optional.of(novaAuthority));
 
-         responseUsuarioDto = usuarioService.updateUser(usuarioSalvo.getId(), requestUserUpdateDto);
+         responseUsuarioDto = usuarioService.updateUsuario(usuarioSalvo.getId(), requestUserUpdateDto);
 
         assertNotNull(responseUsuarioDto, "O objeto está retornando null");
         assertEquals(usuarioSalvo.getId(), responseUsuarioDto.id(), "id do usuário não corresponde");
@@ -169,12 +169,12 @@ class UsuarioServiceTest {
     }
 
     @Test
-    void updateUser_deveRetornarEntityNotFoundException_quandoIdUsuarioNaoEncontrado() {
+    void updateUsuario_deveRetornarEntityNotFoundException_quandoIdUsuarioNaoEncontrado() {
         UUID idInexistente = UUID.randomUUID();
         when(usuarioRepository.findById(idInexistente)).thenReturn(Optional.empty());
 
         assertThrows(EntityNotFoundException.class, () -> {
-            usuarioService.updateUser(idInexistente, requestUserUpdateDto);
+            usuarioService.updateUsuario(idInexistente, requestUserUpdateDto);
         });
 
         verify(usuarioRepository, times(1)).findById(idInexistente);
@@ -183,7 +183,7 @@ class UsuarioServiceTest {
     }
 
     @Test
-    void updateUser_deveRetornarConflictEntityException_quandoNomeJaCadastrado() {
+    void updateUsuario_deveRetornarConflictEntityException_quandoNomeJaCadastrado() {
         UUID idUsuarioExistente = usuarioSalvo.getId();
         String nomeOriginal = usuarioSalvo.getNome();
         String senhaOriginal = usuarioSalvo.getSenha();
@@ -199,7 +199,7 @@ class UsuarioServiceTest {
         when(usuarioRepository.findByNome(requestUserUpdateDto.novoNome())).thenReturn(Optional.of(outroUsuario));
 
         ConflictEntityException exception = assertThrows(ConflictEntityException.class, () -> {
-            usuarioService.updateUser(usuarioSalvo.getId(), requestUserUpdateDto);
+            usuarioService.updateUsuario(usuarioSalvo.getId(), requestUserUpdateDto);
         });
 
         assertTrue(exception.getMessage().contains("Já existe um usuário com este nome"),
@@ -221,7 +221,7 @@ class UsuarioServiceTest {
     }
 
     @Test
-    void findAllUsers_deveRetornarListaResponseUsuarioDto_quandoUsuariosCadastrados() {
+    void findAllUsuarios_deveRetornarListaResponseUsuarioDto_quandoUsuariosCadastrados() {
         Usuario user1 = new Usuario("user1", passwordEncoder.encode("senha1"));
         Usuario user2 = new Usuario("user2", passwordEncoder.encode("senha2"));
         List<Usuario> usuarioList = List.of(user1, user2);
@@ -229,7 +229,7 @@ class UsuarioServiceTest {
         when(usuarioRepository.findAll()).thenReturn(usuarioList);
 
 
-        responseUsuarioDtoList = usuarioService.findAllUsers();
+        responseUsuarioDtoList = usuarioService.findAllUsuarios();
 
         assertNotNull(responseUsuarioDtoList, "Lista não deveria ser nula.");
         assertEquals(usuarioList.size(), responseUsuarioDtoList.size());
@@ -244,10 +244,10 @@ class UsuarioServiceTest {
     }
 
     @Test
-    void findAllUsers_deveRetornarListaVazia_quandoNaoExistemUsuarios() {
+    void findAllUsuarios_deveRetornarListaVazia_quandoNaoExistemUsuarios() {
         when(usuarioRepository.findAll()).thenReturn(List.of());
 
-        responseUsuarioDtoList = usuarioService.findAllUsers();
+        responseUsuarioDtoList = usuarioService.findAllUsuarios();
 
         assertNotNull(responseUsuarioDtoList, "O response deveria estar vazio");
         assertTrue(responseUsuarioDtoList.isEmpty(), "A lista deveria estar vazia.");
@@ -255,32 +255,32 @@ class UsuarioServiceTest {
     }
 
     @Test
-    void deleteUser_naoDeveRetornarNada_quandoSucesso() {
+    void deleteUsuario_naoDeveRetornarNada_quandoSucesso() {
         when(usuarioRepository.findById(usuarioSalvo.getId())).thenReturn(Optional.of(usuarioSalvo));
 
-        usuarioService.deleteUser(usuarioSalvo.getId());
+        usuarioService.deleteUsuario(usuarioSalvo.getId());
         verify(usuarioRepository, times(1)).delete(usuarioSalvo);
     }
 
     @Test
-    void deleteUser_deveRetornarEntityNotFoundException_quandoUsuarioNaoEncontrado() {
+    void deleteUsuario_deveRetornarEntityNotFoundException_quandoUsuarioNaoEncontrado() {
         UUID idUsuarioNaoExistente = UUID.randomUUID();
         when(usuarioRepository.findById(idUsuarioNaoExistente)).thenReturn(Optional.empty());
 
-        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> usuarioService.deleteUser(idUsuarioNaoExistente));
+        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> usuarioService.deleteUsuario(idUsuarioNaoExistente));
 
         assertTrue(exception.getMessage().contains("Usuário com Id: " + idUsuarioNaoExistente.toString() + " não encontrado."), "Mensagens não coincidem.");
         verifyNoMoreInteractions(usuarioRepository);
     }
 
     @Test
-    void findUsersByName_deveRetornarListaResponseUsuarioDto_quandoExistemUsuario() {
+    void findByUsuarioPorNome_deveRetornarListaResponseUsuarioDto_quandoExistemUsuario() {
         Usuario user1 = new Usuario("user1", "senha1");
         Usuario user2 = new Usuario("user2", "senha2");
         List<Usuario> usuarioList = List.of(user1, user2);
         when(usuarioRepository.findByNomeContainingOrderByNome("user")).thenReturn(usuarioList);
 
-        responseUsuarioDtoList = usuarioService.findUsersByName("user");
+        responseUsuarioDtoList = usuarioService.findByUsuarioPorNome("user");
 
         assertNotNull(responseUsuarioDtoList, "lista não deveria ser vazia.");
         assertAll("Validação de usuários retornados",
@@ -293,11 +293,11 @@ class UsuarioServiceTest {
     }
 
     @Test
-    void findById_deveRetornarResponseUsuarioDto_quandoUsuarioEncontrado() {
+    void findByUsuarioPorId_deveRetornarResponseUsuarioDto_quandoUsuarioEncontrado() {
         UUID idUsuarioExistente = usuarioSalvo.getId();
         when(usuarioRepository.findById(idUsuarioExistente)).thenReturn(Optional.of(usuarioSalvo));
 
-        responseUsuarioDto = usuarioService.findById(idUsuarioExistente);
+        responseUsuarioDto = usuarioService.findByUsuarioPorId(idUsuarioExistente);
 
         assertNotNull(responseUsuarioDto);
         assertEquals(usuarioSalvo.getId(), responseUsuarioDto.id(), "Id não coincidem");
@@ -308,12 +308,12 @@ class UsuarioServiceTest {
     }
 
     @Test
-    void findById_deveRetornarEntityNotFoundExeption_quandoUsuarioNaoEncontrado() {
+    void findByUsuarioPorId_deveRetornarEntityNotFoundExeption_quandoUsuarioNaoEncontrado() {
         UUID idUsuarioInexistente = UUID.randomUUID();
         when(usuarioRepository.findById(idUsuarioInexistente)).thenReturn(Optional.empty());
 
         EntityNotFoundException exception = assertThrows(EntityNotFoundException.class,
-                () -> usuarioService.findById(idUsuarioInexistente));
+                () -> usuarioService.findByUsuarioPorId(idUsuarioInexistente));
 
         assertEquals(exception.getMessage(), "Usuário com Id: " + idUsuarioInexistente + " não encontrado.");
         verifyNoMoreInteractions(usuarioRepository);

@@ -20,6 +20,6 @@ public class AutenticacaoService {
     public String autenticar(String usuario, String senha){
         var auth = new UsernamePasswordAuthenticationToken(usuario, senha);
         Authentication authentication = authenticationManager.authenticate(auth);
-        return jwtService.generateToken(authentication);
+        return jwtService.gerarTokenAcesso(authentication);
     }
 }

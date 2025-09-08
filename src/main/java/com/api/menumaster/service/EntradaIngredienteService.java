@@ -37,7 +37,7 @@ public class EntradaIngredienteService {
     }
 
     @Transactional
-    public ResponseEntradaNotaIngredienteDto entrada(UUID idFornecedor, RequestEntradaNotaIngredienteDto dto) {
+    public ResponseEntradaNotaIngredienteDto salvarEntradaNota(UUID idFornecedor, RequestEntradaNotaIngredienteDto dto) {
         if (dto.itens() == null) {
             throw new EntityNotFoundException("Entrada só possível com iten adicionados.");
         }
@@ -89,33 +89,33 @@ public class EntradaIngredienteService {
         return converteObjetoParaDto(entradaRepository.save(entrada));
     }
 
-    public List<ResponseEntradaNotaIngredienteDto> findAll() {
+    public List<ResponseEntradaNotaIngredienteDto> buscarEntradasIngrediente() {
         List<EntradaIngrediente> entradas = entradaRepository.findAll();
         return converteObjetoParaDto(entradas);
     }
 
-    public List<ResponseEntradaNotaIngredienteDto> findByDataEntrada(LocalDate dataEntrada) {
+    public List<ResponseEntradaNotaIngredienteDto> buscarEntradaIngredientePorDataEntrada(LocalDate dataEntrada) {
         List<EntradaIngrediente> entradas = entradaRepository.findByDataEntrada(dataEntrada);
         return converteObjetoParaDto(entradas);
     }
 
-    public List<ResponseEntradaNotaIngredienteDto> findByFornecedorRazaoSocial(String razaoSocial) {
+    public List<ResponseEntradaNotaIngredienteDto> buscarEntradaIngredientePorFornecedorRazaoSocial(String razaoSocial) {
         List<EntradaIngrediente> entradas = entradaRepository.findByFornecedorRazaoSocial(razaoSocial);
         return converteObjetoParaDto(entradas);
     }
 
-    public List<ResponseEntradaNotaIngredienteDto> findByFornecedorNomeFantasia(String nomeFantasia) {
+    public List<ResponseEntradaNotaIngredienteDto> buscarEntradaIngredientePorFornecedorNomeFantasia(String nomeFantasia) {
         List<EntradaIngrediente> entradas = entradaRepository.findByFornecedorNomeFantasia(nomeFantasia);
         return converteObjetoParaDto(entradas);
     }
 
-    public ResponseEntradaNotaIngredienteDto findByNumeroNota(String numeroNota) {
+    public ResponseEntradaNotaIngredienteDto buscarEntradaIngredientePorNumeroNota(String numeroNota) {
         EntradaIngrediente entrada = entradaRepository.findByNumeroNota(numeroNota)
                 .orElseThrow(() -> new EntityNotFoundException("Não existe nota com esta numeração"));
         return converteObjetoParaDto(entrada);
     }
 
-    public List<ResponseEntradaNotaIngredienteDto> findByValorTotalNota(BigDecimal valorTotal) {
+    public List<ResponseEntradaNotaIngredienteDto> buscarEntradaIngredientePorValorTotalNota(BigDecimal valorTotal) {
         List<EntradaIngrediente> entradas = entradaRepository.findByValorTotal(valorTotal);
         return converteObjetoParaDto(entradas);
     }
