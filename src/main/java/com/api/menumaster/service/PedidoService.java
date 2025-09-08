@@ -166,15 +166,17 @@ public class PedidoService {
 
     public List<ResponsePedidoDto> buscarPedidoPorTotalBetween(BigDecimal inicio, BigDecimal fim) {
         List<Pedido> pedidos;
-        if (fim != null) {
-            if (!(fim.compareTo(inicio) > 0)) {
-                throw new IllegalArgumentException("O valor de inicio precisa ser maior que o do fim");
-            }
-            pedidos = pedidoRepository.findByTotalPedidoBetweenOrderByDataEmissao(inicio, fim);
-        } else {
-            pedidos = pedidoRepository.findByTotalPedidoBetweenOrderByDataEmissao(inicio, inicio);
+
+        if (inicio == null || fim == null) {
+            throw new IllegalArgumentException("Valor de inicio ou fim não podem ser nulos");
         }
-        return converteEntidadeParaDto(pedidos);
+
+        if (fim.compareTo(inicio) > 0) {
+            pedidos = pedidoRepository.findByTotalPedidoBetweenOrderByDataEmissao(inicio, fim);
+            return converteEntidadeParaDto(pedidos);
+        } else {
+            throw new IllegalArgumentException("O valor de inicio precisa ser menor que o do fim");
+        }
     }
 
     public List<ResponsePedidoDto> buscarPedidoPorStatus(StatusPedido status) {
