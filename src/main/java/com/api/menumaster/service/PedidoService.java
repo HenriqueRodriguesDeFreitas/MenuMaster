@@ -2,12 +2,12 @@ package com.api.menumaster.service;
 
 import com.api.menumaster.dtos.request.RequestAtualizarPedidoDto;
 import com.api.menumaster.dtos.request.RequestCriarPedidoDto;
-import com.api.menumaster.dtos.response.ResponseItemPedidoDto;
 import com.api.menumaster.dtos.response.ResponsePedidoDto;
 import com.api.menumaster.exception.custom.ConflictEntityException;
 import com.api.menumaster.exception.custom.ConflictTesourariaException;
 import com.api.menumaster.exception.custom.EntityNotFoundException;
 import com.api.menumaster.exception.custom.EstoqueInsuficienteException;
+import com.api.menumaster.mappper.PedidoMapper;
 import com.api.menumaster.model.*;
 import com.api.menumaster.model.enums.StatusPedido;
 import com.api.menumaster.repository.CaixaRepository;
@@ -32,16 +32,19 @@ public class PedidoService {
     private final ProdutoRepository produtoRepository;
     private final IngredienteRepository ingredienteRepository;
     private final CaixaRepository caixaRepository;
+    private final PedidoMapper pedidoMapper;
     private static final LocalTime TEMPO_PADRAO_INICIO_DIA = LocalTime.of(0, 0, 0);
 
     public PedidoService(PedidoRepository pedidoRepository,
                          ProdutoRepository produtoRepository,
                          IngredienteRepository ingredienteRepository,
-                         CaixaRepository caixaRepository) {
+                         CaixaRepository caixaRepository,
+                         PedidoMapper pedidoMapper) {
         this.pedidoRepository = pedidoRepository;
         this.produtoRepository = produtoRepository;
         this.ingredienteRepository = ingredienteRepository;
         this.caixaRepository = caixaRepository;
+        this.pedidoMapper = pedidoMapper;
     }
 
     @Transactional
@@ -235,14 +238,7 @@ public class PedidoService {
     }
 
     private ResponsePedidoDto converteEntidadeParaDto(Pedido pedido) {
-        List<ResponseItemPedidoDto> itens = pedido.getItensAssociados()
-                .stream()
-                .map(i -> new ResponseItemPedidoDto(i.getProduto().getNome(), i.getQuantidadeProduto(),
-                        i.getProduto().getPrecoVenda())).toList();
-
-        return new ResponsePedidoDto(pedido.getId(), pedido.getMesa(), pedido.getStatusPedido(), pedido.getDataEmissao(),
-                pedido.getDataEdicao(), pedido.getNomeCliente(), pedido.getEndereco(), pedido.getContato(),
-                pedido.getObservacao(), pedido.getTotalPedido(), itens);
+        return pedidoMapper.toResponse(pedido);
     }
 
     private List<ResponsePedidoDto> converteEntidadeParaDto(List<Pedido> pedidos) {
