@@ -73,4 +73,14 @@ public class GlobalExceptionHandle {
         );
         return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(response);
     }
+    @ExceptionHandler(DadoPassadoNuloException.class)
+    public ResponseEntity<ResponseErroDto> handleDadoNuloException(DadoPassadoNuloException e){
+        ResponseErroDto response = new ResponseErroDto(
+                LocalDateTime.now(),
+                HttpStatus.BAD_REQUEST.value(),
+                "Inserido dado vazio.",
+                e.getMessage()
+        );
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    }
 }
