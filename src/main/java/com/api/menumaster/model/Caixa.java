@@ -56,6 +56,10 @@ public class Caixa {
         return id;
     }
 
+    public void setId(UUID id) {
+        this.id = id;
+    }
+
     public BigDecimal getSaldoInicial() {
         return saldoInicial;
     }
