@@ -124,6 +124,33 @@ public class IngredienteService {
         return converteEntityToDto(ingredientes);
     }
 
+    public List<ResponseIngredienteDto> findByPrecoCustoBetween(BigDecimal valorInicial,
+                                                                BigDecimal valorFinal) {
+        validandoSeValoresSaoDiferentesDeNulo(valorInicial, valorFinal);
+
+        if (valorFinal.compareTo(valorInicial) > 0) {
+            List<Ingrediente> ingredientes =
+                    ingredienteRepository.findByPrecoCustoBetween(valorInicial, valorFinal);
+            return converteEntityToDto(ingredientes);
+        } else {
+            throw new IllegalArgumentException("Valor inicial precisa ser menor que o final.");
+        }
+    }
+
+    public List<ResponseIngredienteDto> findByPrecoVendaBetween(BigDecimal valorInicial,
+                                                                BigDecimal valorFinal) {
+
+        validandoSeValoresSaoDiferentesDeNulo(valorInicial, valorFinal);
+
+        if (valorFinal.compareTo(valorInicial) > 0) {
+            List<Ingrediente> ingredientes =
+                    ingredienteRepository.findByPrecoVendaBetween(valorInicial, valorFinal);
+            return converteEntityToDto(ingredientes);
+        } else {
+            throw new IllegalArgumentException("Valor inicial precisa ser menor que final.");
+        }
+    }
+
     public List<ResponseIngredienteDto> findByIsAtivo() {
         List<Ingrediente> ingredientes =
                 ingredienteRepository.findByIsAtivoTrue();
