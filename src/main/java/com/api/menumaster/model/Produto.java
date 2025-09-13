@@ -19,10 +19,10 @@ public class Produto {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(length = 50, nullable = false)
+    @Column(length = 50, nullable = false, unique = true)
     private String nome;
 
-    @Column(name = "codigo_produto", nullable = false)
+    @Column(name = "codigo_produto", nullable = false, unique = true)
     private Long codigoProduto;
 
     @Column(length = 250)
@@ -163,7 +163,7 @@ public class Produto {
     }
 
     public void calcularPrecoVenda() {
-        this.precoVenda = precoCusto.multiply(BigDecimal.valueOf(1.1))
+        this.precoVenda = precoCusto.multiply(BigDecimal.valueOf(1.35))
                 .setScale(2, RoundingMode.HALF_UP);
     }
 }
