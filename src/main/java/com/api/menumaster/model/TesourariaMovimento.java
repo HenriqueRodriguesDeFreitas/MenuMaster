@@ -3,6 +3,9 @@ package com.api.menumaster.model;
 import com.api.menumaster.model.enums.FormaPagamento;
 import com.api.menumaster.model.enums.TipoMovimento;
 import jakarta.persistence.*;
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -24,11 +27,12 @@ public class TesourariaMovimento {
     private LocalDateTime dataMovimentacao;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "tipo_movimento", nullable = false, length = 20)
+    @Column(columnDefinition = "tipomovimento", name = "tipo_movimento", nullable = false)
     private TipoMovimento tipoMovimento;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "forma_pagamento", length = 20, nullable = false)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
+    @Column(columnDefinition = "formapagamento", name = "forma_pagamento", nullable = false)
     private FormaPagamento formaPagamento;
 
     @Column(precision = 10, scale = 2, nullable = false)
