@@ -24,7 +24,7 @@ public class UsuarioController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyAuthority('ADMIN','USUARIO_CREATE')")
+//    @PreAuthorize("hasAnyAuthority('ADMIN','USUARIO_CREATE')")
     public ResponseEntity<?> salvar(@RequestBody @Valid RequestUsuarioDto dto) {
         return ResponseEntity.ok(usuarioService.salvarNovoUsuario(dto));
     }
