@@ -34,7 +34,7 @@ public class RefreshTokenService {
         }
 
         RefreshToken refresh = refreshTokenRepository
-                .findByJwtAndRevogadoFalse(jwt.getId())
+                .findByJwtIdAndRevogadoFalse(jwt.getId())
                 .orElseThrow(() -> new RuntimeException("Refresh token inválido ou revogado."));
 
         refresh.setRevogado(true);
