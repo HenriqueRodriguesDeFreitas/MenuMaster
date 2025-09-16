@@ -22,7 +22,7 @@ public class AutenticacaoService {
         var auth = new UsernamePasswordAuthenticationToken(usuario, senha);
         Authentication authentication = authenticationManager.authenticate(auth);
 
-        String access = jwtService.gerarTokenAcesso(auth);
+        String access = jwtService.gerarTokenAcesso(authentication);
         String refresh = jwtService.gerarRefreshToken(auth.getName());
 
         return new ResponseToken(access, refresh);
