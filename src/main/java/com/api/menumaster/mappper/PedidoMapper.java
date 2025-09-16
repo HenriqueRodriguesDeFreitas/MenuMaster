@@ -9,6 +9,9 @@ import org.mapstruct.Mapping;
 public interface PedidoMapper {
 
     @Mapping(target = "itens", source = "itensAssociados")
+    @Mapping(target = "status", source = "statusPedido")
+    @Mapping(target = "emissao", source = "dataEmissao")
+    @Mapping(target = "editado", source = "dataEdicao")
     ResponsePedidoDto toResponse(Pedido pedido);
 
 }
