@@ -6,6 +6,7 @@ import com.api.menumaster.exception.custom.ConflictTesourariaException;
 import com.api.menumaster.model.Caixa;
 import com.api.menumaster.model.CaixaMovimento;
 import com.api.menumaster.model.enums.FormaPagamento;
+import com.api.menumaster.model.enums.TipoMovimento;
 import com.api.menumaster.repository.CaixaMovimentoRepository;
 import com.api.menumaster.repository.CaixaRepository;
 import jakarta.transaction.Transactional;
@@ -34,7 +35,7 @@ public class CaixaMovimentoService {
 
         Caixa caixaAberto = validarCaixaAberto(authentication.getName());
 
-        var movimento = construirMovimento(dto, authentication, caixaAberto);
+        var movimento = construirMovimento(dto, authentication, caixaAberto, TipoMovimento.ENTRADA);
 
 
         return toResponseDto(movimentoRepository.save(movimento));
@@ -45,7 +46,7 @@ public class CaixaMovimentoService {
                                                      Authentication authentication){
         validarValorMovimentoMaiorQueZero(dto);
         Caixa caixaAberto = validarCaixaAberto(authentication.getName());
-        var movimento = construirMovimento(dto, authentication, caixaAberto);
+        var movimento = construirMovimento(dto, authentication, caixaAberto, TipoMovimento.SAIDA);
         return toResponseDto(movimentoRepository.save(movimento));
     }
 
@@ -63,15 +64,20 @@ public class CaixaMovimentoService {
 
     private CaixaMovimento construirMovimento(RequestMovimentoCaixaDto dto,
                                               Authentication authentication,
-                                              Caixa caixaAberto){
+                                              Caixa caixaAberto,
+                                              TipoMovimento tipoMovimento){
         CaixaMovimento movimento =  new CaixaMovimento();
         movimento.setUsuarioMovimento(authentication.getName());
         movimento.setDataMovimento(LocalDateTime.now());
-        movimento.setTipoMovimento(dto.tipoMovimento());
         movimento.setValor(dto.valor());
         movimento.setDescricao(dto.descricao());
         movimento.setFormaPagamento(FormaPagamento.DINHEIRO);
         movimento.setCaixa(caixaAberto);
+
+        if(tipoMovimento.equals(TipoMovimento.ENTRADA))
+            movimento.setTipoMovimento(TipoMovimento.ENTRADA);
+        if(tipoMovimento.equals(TipoMovimento.SAIDA))
+            movimento.setTipoMovimento(TipoMovimento.SAIDA);
 
         return movimento;
     }
