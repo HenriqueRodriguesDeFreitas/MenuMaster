@@ -60,6 +60,8 @@ public class PedidoService {
         pedido.setObservacao(dto.observacao());
         pedido.setUsuarioCriou(authentication.getName());
         pedido.setStatusPedido(StatusPedido.AGUARDANDO);
+        pedido.setMesa(dto.mesa());
+        pedido.setUsuarioEditou(authentication.getName());
 
         if (dto.mesa() == null || dto.mesa() < 0) {
             pedido.setMesa(0);
@@ -74,7 +76,9 @@ public class PedidoService {
 
         pedido.setCaixa(caixa);
         caixa.getPedidos().add(pedido);
-        return converteEntidadeParaDto(pedidoRepository.save(pedido));
+
+        Pedido pedidoSalvo = pedidoRepository.save(pedido);
+        return converteEntidadeParaDto(pedidoSalvo);
     }
 
     @Transactional
