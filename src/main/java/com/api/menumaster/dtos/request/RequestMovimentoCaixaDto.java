@@ -7,6 +7,5 @@ import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
 
 public record RequestMovimentoCaixaDto(@NotNull BigDecimal valor,
-                                       @NotNull @Size(max = 7) TipoMovimento tipoMovimento,
                                        @NotNull @Size(max = 200) String descricao) {
 }
