@@ -19,7 +19,7 @@ public class LogoutTokenService {
     public void logout(String refreshToken) {
         Jwt jwt = jwtDecoder.decode(refreshToken);
 
-        refreshTokenRepository.findByJwtAndRevogadoFalse(jwt.getId())
+        refreshTokenRepository.findByJwtIdAndRevogadoFalse(jwt.getId())
                 .ifPresent(token -> {
                     token.setRevogado(true);
                     refreshTokenRepository.save(token);
