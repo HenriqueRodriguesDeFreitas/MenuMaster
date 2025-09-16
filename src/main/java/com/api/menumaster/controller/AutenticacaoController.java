@@ -38,6 +38,7 @@ public class AutenticacaoController {
         return refreshTokenService.refreshAccessToken(token.refreshToken());
     }
 
+    @PostMapping("/logout")
     public void logout(@RequestBody RequestLogoutTokenDto token) {
         logoutTokenService.logout(token.token());
     }
