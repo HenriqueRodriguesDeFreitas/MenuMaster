@@ -1,5 +1,6 @@
 package com.api.menumaster.service;
 
+import com.api.menumaster.dtos.response.ResponseToken;
 import com.api.menumaster.service.security.JwtService;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -17,9 +18,13 @@ public class AutenticacaoService {
         this.authenticationManager = authenticationManager;
     }
 
-    public String autenticar(String usuario, String senha){
+    public ResponseToken autenticar(String usuario, String senha) {
         var auth = new UsernamePasswordAuthenticationToken(usuario, senha);
         Authentication authentication = authenticationManager.authenticate(auth);
-        return jwtService.gerarTokenAcesso(authentication);
+
+        String access = jwtService.gerarTokenAcesso(auth);
+        String refresh = jwtService.gerarRefreshToken(auth.getName());
+
+        return new ResponseToken(access, refresh);
     }
 }
