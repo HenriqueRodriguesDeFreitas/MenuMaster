@@ -4,6 +4,8 @@ import com.api.menumaster.exception.custom.DadoPassadoNuloException;
 import com.api.menumaster.model.enums.FormaPagamento;
 import com.api.menumaster.model.enums.TipoMovimento;
 import jakarta.persistence.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -27,11 +29,13 @@ public class CaixaMovimento {
     private BigDecimal valor = BigDecimal.ZERO;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "tipo_movimento", nullable = false, length = 7)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
+    @Column(columnDefinition = "tipomovimento",name = "tipo_movimento", nullable = false)
     private TipoMovimento tipoMovimento;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "forma_pagamento", length = 8, nullable = false)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
+    @Column(columnDefinition = "formapagamento",name = "forma_pagamento", nullable = false)
     private FormaPagamento formaPagamento;
 
     @Column(length = 200)
