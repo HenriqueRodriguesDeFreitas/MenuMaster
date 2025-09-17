@@ -8,10 +8,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/tesouraria-movimentacao")
@@ -36,6 +35,12 @@ public class TesourariaMovimentoController {
     public ResponseEntity<ResponseTesourariaMovimentoDto> efetuarMovimentoSaida(@RequestBody @Valid
                                                                                 RequestMovimentoTesourariaDto dto) {
      return ResponseEntity.ok(movimentacaoService.efetuarMovimentoSaida(dto, getAuthentication()));
+    }
+
+    @GetMapping
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'TESOURARIA_MOVIMENTO_READ')")
+    public ResponseEntity<List<ResponseTesourariaMovimentoDto>> buscarMovimentacoes(){
+        return ResponseEntity.ok(movimentacaoService.buscarMovimentacoes());
     }
 
     private Authentication getAuthentication() {
