@@ -24,8 +24,8 @@ public class GlobalExceptionHandle {
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<ResponseErroDto> handleNotFoundException(EntityNotFoundException e) {
         ResponseErroDto response = new ResponseErroDto(LocalDateTime.now(),
-                HttpStatus.CONFLICT.value(),
-                "Erro de entidade não encontrada",
+                HttpStatus.NOT_FOUND.value(),
+                "Erro de objeto não encontrada",
                 e.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
     }
@@ -64,7 +64,7 @@ public class GlobalExceptionHandle {
     }
 
     @ExceptionHandler(EstoqueInsuficienteException.class)
-    public ResponseEntity<ResponseErroDto> handleEstoqueInsuficienteException(EstoqueInsuficienteException e){
+    public ResponseEntity<ResponseErroDto> handleEstoqueInsuficienteException(EstoqueInsuficienteException e) {
         ResponseErroDto response = new ResponseErroDto(
                 LocalDateTime.now(),
                 HttpStatus.UNPROCESSABLE_ENTITY.value(),
@@ -73,8 +73,9 @@ public class GlobalExceptionHandle {
         );
         return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(response);
     }
+
     @ExceptionHandler(DadoPassadoNuloException.class)
-    public ResponseEntity<ResponseErroDto> handleDadoNuloException(DadoPassadoNuloException e){
+    public ResponseEntity<ResponseErroDto> handleDadoNuloException(DadoPassadoNuloException e) {
         ResponseErroDto response = new ResponseErroDto(
                 LocalDateTime.now(),
                 HttpStatus.BAD_REQUEST.value(),
