@@ -219,7 +219,7 @@ class PedidoServiceTest {
         RequestAtualizarPedidoDto requestAtualizarPedidoDto = new RequestAtualizarPedidoDto(
                 2, "cliente2",
                 "endereço2", "contato2",
-                StatusPedido.PREPARANDO, "observação2",
+                StatusPedido.AGUARDANDO, "observação2",
                 List.of(requestItemPedidoDto));
 
         pedidoSalvo.setDataEdicao(hoje);
