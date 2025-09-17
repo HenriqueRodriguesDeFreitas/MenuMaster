@@ -196,7 +196,7 @@ public class Pedido {
                 throw new IllegalArgumentException("Quantidade precisa ser preenchida com valor maior que zero");
             }
             if (i.getProduto() == null) {
-                throw new ConflictEntityException("Produtos precisan ser adicionados no pedido");
+                throw new ConflictEntityException("Produtos precisam ser adicionados no pedido");
             }
             if (i.getProduto().getUnidadeMedida().equals(UnidadeMedida.UN)) {
                 i.setQuantidadeProduto(i.getQuantidadeProduto().setScale(0, RoundingMode.DOWN));
