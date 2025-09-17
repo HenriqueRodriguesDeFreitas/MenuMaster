@@ -13,6 +13,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class TesourariaMovimentoService {
@@ -52,8 +53,9 @@ public class TesourariaMovimentoService {
         return movimentoMapper.toResponse(movimentoSalvo);
     }
 
+    @Transactional
     public ResponseTesourariaMovimentoDto efetuarMovimentoSaida(RequestMovimentoTesourariaDto dto,
-                                                                Authentication authentication){
+                                                                Authentication authentication) {
         var tesourariaAberta = tesourariaRepository.findByDataFechamentoIsNull()
                 .orElseThrow(() -> new ConflictTesourariaException("Efetue abertura de tesouraria."));
 
@@ -72,5 +74,10 @@ public class TesourariaMovimentoService {
 
         tesourariaRepository.save(tesourariaAberta);
         return movimentoMapper.toResponse(movimentoSalvo);
+    }
+
+    public List<ResponseTesourariaMovimentoDto> buscarMovimentacoes() {
+        List<TesourariaMovimento> movimentacoes = movimentacaoRepository.findAll();
+        return movimentacoes.stream().map(movimentoMapper::toResponse).toList();
     }
 }
