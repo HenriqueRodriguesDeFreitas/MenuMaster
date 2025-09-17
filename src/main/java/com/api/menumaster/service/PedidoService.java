@@ -85,7 +85,7 @@ public class PedidoService {
     public ResponsePedidoDto editarPedido(UUID idPedido, RequestAtualizarPedidoDto dto,
                                           Authentication authentication) {
         Pedido pedido = pedidoRepository.findById(idPedido)
-                .orElseThrow(() -> new ConflictEntityException("Pedido não encontrado"));
+                .orElseThrow(() -> new EntityNotFoundException("Pedido não encontrado"));
 
         Caixa caixaAtual = validarCaixaAberto(authentication.getName());
 
